@@ -26,9 +26,9 @@
         document.getElementById("copyright").innerHTML = "©" + ((now_year - grt_year < 1) ? now_year : (grt_year + "-" + now_year))
             + "&nbspSarofc"
             + "&nbsp|&nbspPowerd by&nbsp"
-            + "<a href="\"https://hexo.io\"" target="\"_blank\"" rel="\"nofollow" noopener\"><span><u>Hexo</u></span></a>"
+            + "<a href=\"https://hexo.io\" target=\"_blank\" rel=\"nofollow noopener\"><span><u>Hexo</u></span></a>"
             + "&nbsp\&&nbsp"
-            + "<a href="\"https://github.com/fluid-dev/hexo-theme-fluid\"" target="\"_blank\"" rel="\"nofollow" noopener\"><span><u>Fluid</u></span></a>";
+            + "<a href=\"https://github.com/fluid-dev/hexo-theme-fluid\" target=\"_blank\" rel=\"nofollow noopener\"><span><u>Fluid</u></span></a>";
         document.getElementById("timeDate").innerHTML = "在逝去的&nbsp" + dnum + "&nbsp天里";
         // document.getElementById("times").innerHTML = hnum + "&nbsp小时&nbsp" + mnum + "&nbsp分&nbsp" + snum + "&nbsp秒";
     }

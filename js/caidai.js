@@ -186,10 +186,46 @@
                 color = Math.round(random(0, 360)),
                 delay = 0;
             while (true) {
-                if (stop <= 1 0) break; stop--; movex="Math.round((Math.random()" * - 0.2) this._options.horizontalspeed); movey="Math.round((Math.random()" 0.5) (this._height 0.25)); point3="new" point(); point3.copy(point2); if (dir="==" "right") { point3.add(movex, movey); (point2.x>= max) break
+                if (stop <= 0) break;
+                stop--;
+                movex = Math.round((Math.random() * 1 - 0.2) * this._options.horizontalSpeed);
+                movey = Math.round((Math.random() * 1 - 0.5) * (this._height * 0.25));
+                point3 = new Point();
+                point3.copy(point2);
+                if (dir === "right") {
+                    point3.add(movex, movey);
+                    if (point2.x >= max) break
                 } else if (dir === "left") {
                     point3.subtract(movex, movey);
-                    if (point2.x <= 0 min) break } ribbon.push({ point1: new point(point1.x, point1.y), point2: point(point2.x, point2.y), point3: point3, color: color, delay: delay, dir: dir, alpha: 0, phase: }); point1.copy(point2); point2.copy(point3); delay +="4;" color this._ribbons.push(ribbon) }, _drawribbonsection: function (section) { if (section.phase>= 1 && section.alpha <= 0 0) { return true } if (section.delay <="0)" section.phase +="0.02;" section.alpha="Math.sin(section.phase)" * 1; ? : section.alpha;>= 1 ? 1 : section.alpha;
+                    if (point2.x <= min) break
+                }
+                ribbon.push({
+                    point1: new Point(point1.x, point1.y),
+                    point2: new Point(point2.x, point2.y),
+                    point3: point3,
+                    color: color,
+                    delay: delay,
+                    dir: dir,
+                    alpha: 0,
+                    phase: 0
+                });
+                point1.copy(point2);
+                point2.copy(point3);
+                delay += 4;
+                color += this._options.colorCycleSpeed
+            }
+            this._ribbons.push(ribbon)
+        },
+        _drawRibbonSection: function (section) {
+            if (section) {
+                if (section.phase >= 1 && section.alpha <= 0) {
+                    return true
+                }
+                if (section.delay <= 0) {
+                    section.phase += 0.02;
+                    section.alpha = Math.sin(section.phase) * 1;
+                    section.alpha = section.alpha <= 0 ? 0 : section.alpha;
+                    section.alpha = section.alpha >= 1 ? 1 : section.alpha;
                     if (this._options.animateSections) {
                         var mod = Math.sin(1 + section.phase * Math.PI / 2) * 0.1;
                         if (section.dir === "right") {
@@ -287,4 +323,3 @@ new Ribbons({
     parallaxAmount: -0.2,
     animateSections: true
 });
-</=></=></=>
