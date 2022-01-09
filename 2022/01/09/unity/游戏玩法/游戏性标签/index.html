@@ -263,7 +263,7 @@
               <p>在UE4中，层次化标签系统(GameplayTag)大量使用。树形结构，可替代枚举、一些变量，甚至能当成事件来传递。</p>
 <p>设计如下标签，Buff.Strong.Stun、Buff.Weak.Fire、Buff.Weak.Ice。标签Buff.Weak.Fire、Buff.Weak.Ice，MatchesTag(“Buff.Weak”) 都会返回true。那么就可以很轻松的实现Buff驱散，而不用新增各种变量，来处理这些问题。所以GameplayTag的设计尤为重要。</p>
 <p>很多buff都可能会给角色施加Stun效果，如果Stun状态仅仅为一个bool的话，buff的移除就要格外小心，而GameplayTagCountConainer则可以有效解决这个问题。</p>
-<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><img src="pic1.png" srcset="/img/loading.gif" lazyload>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><img src="/pic1.png" srcset="/img/loading.gif" lazyload>
 
 <ol>
 <li>GameplayTag是struct，只保存TagName的TagHash(int)，作为Dictionary的Key是非常高效的。UE则是引擎FName直接实现的，也是hash字符串。</li>
@@ -361,7 +361,7 @@
 <li>GameplayTag可以直接编辑Json文本，也可以在Editor面板里直接编辑。</li>
 <li>Inspector面板可以直接选择对应的GameplayTag，Tag注释也会显示成Tooltip，并且Tag丢失时，会标红。</li>
 </ol>
-<p><img src="pic2.png" srcset="/img/loading.gif" lazyload width="50%"><img src="pic0.png" srcset="/img/loading.gif" lazyload width="50%"></p>
+<p><img src="/pic2.png" srcset="/img/loading.gif" lazyload width="50%"><img src="/pic0.png" srcset="/img/loading.gif" lazyload width="50%"></p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>UE4 GameplayTag</p>
 
             </div>

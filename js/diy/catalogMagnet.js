@@ -41,5 +41,5 @@ const catalogMagnet = new Vue({
 catalogMagnet.link = $(".categoryMagnetitem").children().children().children("a");
 catalogMagnet.postnum = $(".categoryMagnetitem").children().children().children("span");
 let linecolor = catalogMagnet.figLetColor.color
-$("<style type='text/css' id='dynamic-after' />").appendTo("head");
-$("#dynamic-after").text(".magnetname:after{background:" + linecolor + "!important}");
+$("<style type="text/css" id="dynamic-after">").appendTo("head");
+$("#dynamic-after").text(".magnetname:after{background:" + linecolor + "!important}");</style>

@@ -17,7 +17,7 @@ var RENDERER = {
 	setParameters : function(){
 		this.$window = $(window);
 		this.$container = $('#jsi-flying-fish-container');
-		this.$canvas = $('<canvas />');
+		this.$canvas = $('<canvas>');
 		this.context = this.$canvas.appendTo(this.$container).get(0).getContext('2d');
 		this.points = [];
 		this.fishes = [];
@@ -333,4 +333,4 @@ FISH.prototype = {
 };
 $(function(){
 	RENDERER.init();
-});
+});</canvas>

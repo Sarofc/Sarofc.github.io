@@ -29,8 +29,8 @@ var geturl = "/history/json/" + getMonth + ".json"
                 $.each(data[getMonthDate],function(i,n){
                     str+='<li style="list-style: none;height:100px;">' ;
                     str+='<p style="color: #858585;Font-style:italic;font-weight:lighter;float:left;width:100%;font-size: 14px;margin:0px; padding:0px;display:inline-block">';
-                    str+='<i >A.D.</i>' +n.year + '</p>';
-                    str+='<p style="width:100%;float:left;margin:0px; padding:0px;display:inline-block" >';
+                    str+='<i>A.D.</i>' +n.year + '</p>';
+                    str+='<p style="width:100%;float:left;margin:0px; padding:0px;display:inline-block">';
                     str+=n.title + '<i style="Font-style:normal;">。</i>';
                     str+='</p>' + '</li>';
                 });
