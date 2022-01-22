@@ -16,15 +16,15 @@
   <meta name="author" content="Sarofc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="MGFCore Processor Mono回调 开启协程 任务队列 回调函数队列（TODO UnityAPI需要丢到主线程执行，加个延迟功能）   Services 服务器定位模式 替代单例   JobQueue 基于迭代器 基于生产者&#x2F;消费者模式 支持Job之间依赖   Procedure 游戏流程状态机 贯穿整个游戏生命周期 游戏流程粒度细化   Event 基于EventHandler&#x2F;E">
+    <meta name="description" content="MGFCore Main Mono回调 开启协程   FObject EC模式 组件替代单例   UniTask async&#x2F;await异步编程 一定程度解决回调地狱   Event 基于EventHandler&#x2F;EventArgs的事件系统 可全局使用、也可局部使用   Memory SharedPool ObjectPool   Assets 管理Editor、Runtime的资源加载 一键打">
 <meta property="og:type" content="website">
 <meta property="og:title" content="page.title">
 <meta property="og:url" content="https://sarofc.gitee.io/img/mindmap/mgf.mm.html">
 <meta property="og:site_name" content="Sarofc&#39;s Blog">
-<meta property="og:description" content="MGFCore Processor Mono回调 开启协程 任务队列 回调函数队列（TODO UnityAPI需要丢到主线程执行，加个延迟功能）   Services 服务器定位模式 替代单例   JobQueue 基于迭代器 基于生产者&#x2F;消费者模式 支持Job之间依赖   Procedure 游戏流程状态机 贯穿整个游戏生命周期 游戏流程粒度细化   Event 基于EventHandler&#x2F;E">
+<meta property="og:description" content="MGFCore Main Mono回调 开启协程   FObject EC模式 组件替代单例   UniTask async&#x2F;await异步编程 一定程度解决回调地狱   Event 基于EventHandler&#x2F;EventArgs的事件系统 可全局使用、也可局部使用   Memory SharedPool ObjectPool   Assets 管理Editor、Runtime的资源加载 一键打">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2021-03-21T07:03:20.920Z">
-<meta property="article:modified_time" content="2021-03-21T07:03:20.920Z">
+<meta property="article:published_time" content="2022-01-11T09:38:40.102Z">
+<meta property="article:modified_time" content="2022-01-11T09:38:40.102Z">
 <meta property="article:author" content="Sarofc">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -205,28 +205,19 @@
 
 <article class="page-content">
   <h1 id="MGF"><a href="#MGF" class="headerlink" title="MGF"></a>MGF</h1><h2 id="Core"><a href="#Core" class="headerlink" title="Core"></a>Core</h2><ul>
-<li>Processor<ul>
+<li>Main<ul>
 <li>Mono回调</li>
 <li>开启协程</li>
-<li>任务队列</li>
-<li>回调函数队列（TODO UnityAPI需要丢到主线程执行，加个延迟功能）</li>
 </ul>
 </li>
-<li>Services<ul>
-<li>服务器定位模式</li>
-<li>替代单例</li>
+<li>FObject<ul>
+<li>EC模式</li>
+<li>组件替代单例</li>
 </ul>
 </li>
-<li>JobQueue<ul>
-<li>基于迭代器</li>
-<li>基于生产者/消费者模式</li>
-<li>支持Job之间依赖</li>
-</ul>
-</li>
-<li>Procedure<ul>
-<li>游戏流程状态机</li>
-<li>贯穿整个游戏生命周期</li>
-<li>游戏流程粒度细化</li>
+<li>UniTask<ul>
+<li>async/await异步编程</li>
+<li>一定程度解决回调地狱</li>
 </ul>
 </li>
 <li>Event<ul>
@@ -234,35 +225,46 @@
 <li>可全局使用、也可局部使用</li>
 </ul>
 </li>
-<li>Pooling<ul>
-<li>支持UnityEngine.Object</li>
-<li>支持System.Object</li>
+<li>Memory<ul>
+<li>SharedPool</li>
+<li>ObjectPool</li>
 </ul>
 </li>
 <li>Assets<ul>
-<li>管理Editor、Runtime的Unity资源加载</li>
-<li>一键出包，支持流程中插入自定义函数</li>
-<li>资源依赖处理</li>
+<li>管理Editor、Runtime的资源加载</li>
+<li>一键打包</li>
+<li>打包流程扩展</li>
+<li>资源依赖分析</li>
+<li>资源分组策略</li>
 <li>资源更新（TODO）</li>
+</ul>
+</li>
+<li>VirtualFileSystem<ul>
+<li>减少小文件，提高IO效率</li>
 </ul>
 </li>
 </ul>
 <h2 id="Common"><a href="#Common" class="headerlink" title="Common"></a>Common</h2><ul>
 <li>DataTable<ul>
-<li>表格工具</li>
+<li>支持1-4个int作为key</li>
+<li>代码自动生成</li>
 </ul>
 </li>
-<li>Audio（TODO）<ul>
-<li>Buildin(FMOD)</li>
-<li>Wwise</li>
+<li>Audio<ul>
+<li>UnityFMOD</li>
+<li>Wwise(TODO)</li>
 </ul>
 </li>
-<li>Localization</li>
+<li>UI<ul>
+<li>不继承Mono</li>
+<li>每个UI都是单例</li>
+<li>支持自动组件绑定，代码生成</li>
+</ul>
+</li>
 </ul>
 <h2 id="Workflow"><a href="#Workflow" class="headerlink" title="Workflow"></a>Workflow</h2><ul>
 <li>CodeGen<ul>
-<li>绑定UI组件</li>
-<li>EventArgs、Procedure等代码模板</li>
+<li>EventArgs等代码模板</li>
 </ul>
 </li>
 <li>PrefabGen<ul>

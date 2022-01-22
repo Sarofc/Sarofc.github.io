@@ -16,24 +16,22 @@
   <meta name="author" content="Sarofc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="在游戏开发中，必定会有数据编辑、保存和读取。需要兼顾开发效率、运行效率和兼容性。   数据的显示、编辑unity的内置序列化还是比较好用的，所见即所得，但有个比较蛋疼的地方，不支持接口、多态对象。在设计数据结构的时候，如果没有多态，将会有很多数据冗余。。。 在unity2020版本中，多了一个SerializeReference特性，可以帮助我们显示多态数据，但也有个比较蛋疼的地方，它只能显示，不">
+    <meta name="description" content="基于XAsset4.1改造的资源框架，提供一键打包，打包流程扩展，资源分组策略，AssetBundle查看。资源加载异步化，提供async&#x2F;await接口，避免回调地狱，支持直接从远端资源服加载资源（边玩边下）。 资源加载CheckCustomAssets(string assetName) 处理非unity资源，eg. 表格等等 表格打成VFS">
 <meta property="og:type" content="article">
-<meta property="og:title" content="数据的编辑和读写">
-<meta property="og:url" content="https://sarofc.gitee.io/2021/02/20/unity/%E7%BC%96%E8%BE%91%E5%99%A8%E6%89%A9%E5%B1%95/%E6%95%B0%E6%8D%AE%E7%9A%84%E7%BC%96%E8%BE%91%E5%92%8C%E8%AF%BB%E5%86%99/index.html">
+<meta property="og:title" content="资源框架">
+<meta property="og:url" content="https://sarofc.gitee.io/2022/01/10/unity/%E5%9F%BA%E7%A1%80%E6%A1%86%E6%9E%B6/%E8%B5%84%E6%BA%90%E6%A1%86%E6%9E%B6/index.html">
 <meta property="og:site_name" content="Sarofc&#39;s Blog">
-<meta property="og:description" content="在游戏开发中，必定会有数据编辑、保存和读取。需要兼顾开发效率、运行效率和兼容性。   数据的显示、编辑unity的内置序列化还是比较好用的，所见即所得，但有个比较蛋疼的地方，不支持接口、多态对象。在设计数据结构的时候，如果没有多态，将会有很多数据冗余。。。 在unity2020版本中，多了一个SerializeReference特性，可以帮助我们显示多态数据，但也有个比较蛋疼的地方，它只能显示，不">
+<meta property="og:description" content="基于XAsset4.1改造的资源框架，提供一键打包，打包流程扩展，资源分组策略，AssetBundle查看。资源加载异步化，提供async&#x2F;await接口，避免回调地狱，支持直接从远端资源服加载资源（边玩边下）。 资源加载CheckCustomAssets(string assetName) 处理非unity资源，eg. 表格等等 表格打成VFS">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://sarofc.gitee.io/img/index/%E6%95%B0%E6%8D%AE%E7%9A%84%E7%BC%96%E8%BE%91%E5%92%8C%E8%AF%BB%E5%86%99.png">
-<meta property="article:published_time" content="2021-02-19T18:10:29.000Z">
-<meta property="article:modified_time" content="2022-01-09T12:10:29.000Z">
+<meta property="article:published_time" content="2022-01-10T14:24:29.000Z">
+<meta property="article:modified_time" content="2022-01-10T14:24:29.000Z">
 <meta property="article:author" content="Sarofc">
 <meta property="article:tag" content="unity">
-<meta property="article:tag" content="gamedev">
+<meta property="article:tag" content="asset">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://sarofc.gitee.io/img/index/%E6%95%B0%E6%8D%AE%E7%9A%84%E7%BC%96%E8%BE%91%E5%92%8C%E8%AF%BB%E5%86%99.png">
   
   
-  <title>数据的编辑和读写 - Sarofc&#39;s Blog</title>
+  <title>资源框架 - Sarofc&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
 
@@ -183,7 +181,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="数据的编辑和读写">
+            <span class="h2" id="subtitle" title="资源框架">
               
             </span>
 
@@ -193,8 +191,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2021-02-20 02:10" pubdate>
-        2021年2月20日 凌晨
+      <time datetime="2022-01-10 22:24" pubdate>
+        2022年1月10日 晚上
       </time>
     </span>
   
@@ -204,7 +202,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.8k 字
+      169 字
     </span>
   
 
@@ -213,7 +211,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      16 分钟
+      2 分钟
     </span>
   
 
@@ -250,47 +248,18 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">数据的编辑和读写</h1>
+            <h1 style="display: none">资源框架</h1>
             
               <p class="note note-info">
                 
-                  本文最后更新于：13 天前
+                  本文最后更新于：12 天前
                 
               </p>
             
             <div class="markdown-body">
-              <p>在游戏开发中，必定会有数据编辑、保存和读取。需要兼顾<code>开发效率、运行效率和兼容性</code>。</p>
-<img src="/img/index/数据的编辑和读写.png" srcset="/img/loading.gif" lazyload>
-
-<h2 id="数据的显示、编辑"><a href="#数据的显示、编辑" class="headerlink" title="数据的显示、编辑"></a>数据的显示、编辑</h2><p>unity的内置序列化还是比较好用的，所见即所得，但有个比较蛋疼的地方，不支持<code>接口、多态对象</code>。在设计数据结构的时候，如果没有多态，将会有很多数据冗余。。。</p>
-<p>在unity2020版本中，多了一个<code>SerializeReference</code>特性，可以帮助我们显示多态数据，但也有个比较蛋疼的地方，它只能显示，不能编辑，你说艹蛋不艹蛋🙄，做功能只做一半之unity。</p>
-<p>这里，我们使用Odin插件。如果没有Odin，可以考虑<a target="_blank" rel="noopener" href="https://github.com/TextusGames/UnitySerializedReferenceUI">UnitySerializedReferenceUI</a>。有了上面的基础，就可以在编辑器下快速创建、删除多态对象了！</p>
-<h3 id="不使用多态"><a href="#不使用多态" class="headerlink" title="不使用多态"></a>不使用多态</h3><figure class="highlight cs"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></div></td><td class="code"><pre><code class="hljs cs"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">data</span><br>&#123;<br>    <span class="hljs-comment">// event id</span><br>    <span class="hljs-keyword">public</span> uint id;<br><br>    <span class="hljs-comment">// animation event parameter</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">string</span> animationName;<br><br>    <span class="hljs-comment">// sound event parameter</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">string</span> soundName;<br><br>    <span class="hljs-comment">// more and more...</span><br>&#125;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">table</span><br>&#123;<br>    <span class="hljs-keyword">public</span> List&lt;data&gt; datas;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>动画事件只会用到animationName，声音事件只会用到soundName，但每个data都包含了其他无用字段，这真是太。。。</p>
-<p>如果在unityeditor下编辑，还得根据事件类型做switch case，只在面板中只曝露出有用的参数。。。不然。。。</p>
-<p>如果采用json、xml之类自动化的方式来保存，那无用的参数就全进文本了。。。手写parser？那慢慢写吧。。。</p>
-<h3 id="使用多态"><a href="#使用多态" class="headerlink" title="使用多态"></a>使用多态</h3><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs cs"><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">class</span> <span class="hljs-title">data</span><br>&#123;<br>    <span class="hljs-comment">// event id</span><br>    <span class="hljs-keyword">public</span> uint id;<br>&#125;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">animation_data</span> : <span class="hljs-title">data</span><br>&#123;<br>    <span class="hljs-comment">// animation event parameter</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">string</span> animationName;<br>&#125;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">sound_data</span> : <span class="hljs-title">data</span><br>&#123;<br>    <span class="hljs-comment">// sound event parameter</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">string</span> soundName;<br>&#125;<br><br><span class="hljs-comment">// more and more...</span><br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">table</span><br>&#123;<br>    <span class="hljs-keyword">public</span> List&lt;data&gt; datas;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>这样数据结构看起来就清晰多了，而且不会存储不必要的东西！文件大小、内存大小都会降低！也不用编写又臭又长的编辑器代码和序列化代码！</p>
-<h2 id="数据的读写"><a href="#数据的读写" class="headerlink" title="数据的读写"></a>数据的读写</h2><p>处理了显示、编辑的问题，另一个问题就是编辑器读取，以及运行时读写的问题了，不过一般运行时只考虑读。</p>
-<p>序列化库可以先选用 json.net 或者 protobuf.net，都支持多态序列化。</p>
-<p>数据的读写有个问题，我们可能在开发过程中修改数据结构，可能有以下几种问题：</p>
-<ol>
-<li>字段名改变</li>
-<li>基元类型改变，如，int-&gt;string</li>
-<li>容器类型改变，如，list-&gt;dictionary</li>
-<li>数据结构类改版，如，classA包含a、b、c，现要改为classA包含classB，classB包含a、b、c</li>
-</ol>
-<p>出现上述问题后，plan A，手动检查，重新弄。<s>策划：头伸过来，我给你加个buff。</s>哈哈哈~</p>
-<p>plan B，使用序列化库解决：</p>
-<ol>
-<li>字段名改变<br> protobuf使用int作为key，仅改变字段名，没有任何影响。<br> json.net则使用JsonProperty即可指定名称，类似unity的SerializeAs。</li>
-<li>剩下所有，可以考虑如下方案<br>被<code>（ProtoAfterDeserializaton、ProtoBeforeDeserializaton）、（OnSerializing、OnDeserialized）</code>等特性标记的方法可以在对应时机的被反射调用，所以利用这个，我们可以编写兼容代码，来最大化保证数据的兼容性！</li>
-</ol>
-<h2 id="坑点"><a href="#坑点" class="headerlink" title="坑点"></a>坑点</h2><p>Q: SerializeReference 在类名修改后，可能会出现报错，且编辑器下ScriptableObject无法保存。</p>
-<p>A: 由于我们是序列化成自己的数据文件了，则可以删掉后，再重新生成ScriptableObject</p>
-<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>有了以上基础，即可在unity里编辑逻辑数据，从了避免在excel里抽象数据结构了。</p>
+              <p>基于<code>XAsset4.1</code>改造的资源框架，提供一键打包，打包流程扩展，资源分组策略，AssetBundle查看。资源加载异步化，提供async/await接口，避免回调地狱，支持直接从远端资源服加载资源（边玩边下）。</p>
+<h2 id="资源加载"><a href="#资源加载" class="headerlink" title="资源加载"></a>资源加载</h2><p>CheckCustomAssets(string assetName) 处理非unity资源，eg. 表格等等</p>
+<p>表格打成VFS</p>
 
             </div>
             <hr>
@@ -310,7 +279,7 @@
                     
                       <a class="hover-with-bg" href="/tags/unity/">unity</a>
                     
-                      <a class="hover-with-bg" href="/tags/gamedev/">gamedev</a>
+                      <a class="hover-with-bg" href="/tags/asset/">asset</a>
                     
                   </div>
                 
@@ -322,23 +291,6 @@
                   
                 </p>
               
-              
-                <div class="post-prevnext">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2021/10/29/unity/%E5%9F%BA%E7%A1%80%E6%A1%86%E6%9E%B6/ugui%E7%BB%84%E4%BB%B6%E7%BB%91%E5%AE%9A%E5%92%8C%E4%BB%A3%E7%A0%81%E7%94%9F%E6%88%90/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">ugui组件绑定和代码生成</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                  </article>
-                </div>
               
             </div>
 

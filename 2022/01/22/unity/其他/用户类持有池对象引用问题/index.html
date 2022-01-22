@@ -16,24 +16,23 @@
   <meta name="author" content="Sarofc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="在游戏开发中，必定会有数据编辑、保存和读取。需要兼顾开发效率、运行效率和兼容性。   数据的显示、编辑unity的内置序列化还是比较好用的，所见即所得，但有个比较蛋疼的地方，不支持接口、多态对象。在设计数据结构的时候，如果没有多态，将会有很多数据冗余。。。 在unity2020版本中，多了一个SerializeReference特性，可以帮助我们显示多态数据，但也有个比较蛋疼的地方，它只能显示，不">
+    <meta name="description" content="通常游戏开发，带gc的语言，频繁创建的小对象，都会考虑用对象池优化，从而减少gc耗时，内存碎片。但是对象池管理不当，是非常危险的，而且会增加编码难度，可能使原本易于维护的代码变得复杂化。 用户案例，用户类需要持有池对象A的引用，进行一些操作，但池对象A可能随时被回收掉，或者回收后再利用了，这时候再通过池对象A的引用来使用，就会出现非常严重得错误。 上述用户案例中，池对象的生命周期可能很难控制，变得">
 <meta property="og:type" content="article">
-<meta property="og:title" content="数据的编辑和读写">
-<meta property="og:url" content="https://sarofc.gitee.io/2021/02/20/unity/%E7%BC%96%E8%BE%91%E5%99%A8%E6%89%A9%E5%B1%95/%E6%95%B0%E6%8D%AE%E7%9A%84%E7%BC%96%E8%BE%91%E5%92%8C%E8%AF%BB%E5%86%99/index.html">
+<meta property="og:title" content="用户类持有池对象引用问题">
+<meta property="og:url" content="https://sarofc.gitee.io/2022/01/22/unity/%E5%85%B6%E4%BB%96/%E7%94%A8%E6%88%B7%E7%B1%BB%E6%8C%81%E6%9C%89%E6%B1%A0%E5%AF%B9%E8%B1%A1%E5%BC%95%E7%94%A8%E9%97%AE%E9%A2%98/index.html">
 <meta property="og:site_name" content="Sarofc&#39;s Blog">
-<meta property="og:description" content="在游戏开发中，必定会有数据编辑、保存和读取。需要兼顾开发效率、运行效率和兼容性。   数据的显示、编辑unity的内置序列化还是比较好用的，所见即所得，但有个比较蛋疼的地方，不支持接口、多态对象。在设计数据结构的时候，如果没有多态，将会有很多数据冗余。。。 在unity2020版本中，多了一个SerializeReference特性，可以帮助我们显示多态数据，但也有个比较蛋疼的地方，它只能显示，不">
+<meta property="og:description" content="通常游戏开发，带gc的语言，频繁创建的小对象，都会考虑用对象池优化，从而减少gc耗时，内存碎片。但是对象池管理不当，是非常危险的，而且会增加编码难度，可能使原本易于维护的代码变得复杂化。 用户案例，用户类需要持有池对象A的引用，进行一些操作，但池对象A可能随时被回收掉，或者回收后再利用了，这时候再通过池对象A的引用来使用，就会出现非常严重得错误。 上述用户案例中，池对象的生命周期可能很难控制，变得">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://sarofc.gitee.io/img/index/%E6%95%B0%E6%8D%AE%E7%9A%84%E7%BC%96%E8%BE%91%E5%92%8C%E8%AF%BB%E5%86%99.png">
-<meta property="article:published_time" content="2021-02-19T18:10:29.000Z">
-<meta property="article:modified_time" content="2022-01-09T12:10:29.000Z">
+<meta property="article:published_time" content="2022-01-22T14:42:41.000Z">
+<meta property="article:modified_time" content="2022-01-22T14:42:41.000Z">
 <meta property="article:author" content="Sarofc">
+<meta property="article:tag" content="object pool">
 <meta property="article:tag" content="unity">
-<meta property="article:tag" content="gamedev">
+<meta property="article:tag" content="c#">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://sarofc.gitee.io/img/index/%E6%95%B0%E6%8D%AE%E7%9A%84%E7%BC%96%E8%BE%91%E5%92%8C%E8%AF%BB%E5%86%99.png">
   
   
-  <title>数据的编辑和读写 - Sarofc&#39;s Blog</title>
+  <title>用户类持有池对象引用问题 - Sarofc&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
 
@@ -183,7 +182,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="数据的编辑和读写">
+            <span class="h2" id="subtitle" title="用户类持有池对象引用问题">
               
             </span>
 
@@ -193,8 +192,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2021-02-20 02:10" pubdate>
-        2021年2月20日 凌晨
+      <time datetime="2022-01-22 22:42" pubdate>
+        2022年1月22日 晚上
       </time>
     </span>
   
@@ -204,7 +203,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.8k 字
+      2.1k 字
     </span>
   
 
@@ -213,7 +212,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      16 分钟
+      18 分钟
     </span>
   
 
@@ -250,47 +249,22 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">数据的编辑和读写</h1>
+            <h1 style="display: none">用户类持有池对象引用问题</h1>
             
               <p class="note note-info">
                 
-                  本文最后更新于：13 天前
+                  本文最后更新于：3 小时前
                 
               </p>
             
             <div class="markdown-body">
-              <p>在游戏开发中，必定会有数据编辑、保存和读取。需要兼顾<code>开发效率、运行效率和兼容性</code>。</p>
-<img src="/img/index/数据的编辑和读写.png" srcset="/img/loading.gif" lazyload>
+              <p>通常游戏开发，带gc的语言，频繁创建的小对象，都会考虑用对象池优化，从而减少gc耗时，内存碎片。但是对象池管理不当，是非常危险的，而且会增加编码难度，可能使原本易于维护的代码变得复杂化。</p>
+<p>用户案例，用户类需要持有<code>池对象A</code>的引用，进行一些操作，但<code>池对象A</code>可能随时被回收掉，或者回收后再利用了，这时候再通过<code>池对象A</code>的引用来使用，就会出现非常严重得错误。</p>
+<p>上述用户案例中，池对象的生命周期可能很难控制，变得难以维护，但有时候又有这种需求，又想享受对象池带来的性能提升。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><figure class="highlight csharp"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></div></td><td class="code"><pre><code class="hljs csharp"><span class="hljs-comment">// struct实现，避免分配堆内存</span><br><span class="hljs-comment">// 实现IEquatable接口，重写HashCode方法，可用于字典，而没有额外内存分配</span><br><span class="hljs-comment">// 重写操作符，方便使用</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">struct</span> ObjectHandle : IEquatable&lt;ObjectHandle&gt;<br>&#123;<br>    <span class="hljs-comment">// 池对象维护一个ObjectID，每次生成对象时，全局自增</span><br>    <span class="hljs-keyword">public</span> Object Object &#123; <span class="hljs-keyword">get</span>; <span class="hljs-keyword">private</span> <span class="hljs-keyword">set</span>; &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">int</span> Handle =&gt; m_CachedObjectID;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> <span class="hljs-built_in">int</span> m_CachedObjectID; <span class="hljs-comment">// 从1开始有效，0无效</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">ObjectHandle</span>(<span class="hljs-params">Object Object</span>)</span><br><span class="hljs-function"></span>    &#123;<br>        <span class="hljs-comment">// 创建一个Handle，记录当前对象的引用，以及ObjectID</span><br>        Object = Object;<br>        m_CachedObjectID = Object.ObjectID;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-built_in">bool</span> <span class="hljs-title">IsValid</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        <span class="hljs-comment">// 对象不为空，且对象的ObjectID等于创建Handle时的ObjectID，才会认为对象可操作，否则，不应该再操作此对象了</span><br>        <span class="hljs-keyword">return</span> Object != <span class="hljs-literal">null</span> &amp;&amp; m_CachedObjectID == Object.ObjectID;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">implicit</span> <span class="hljs-keyword">operator</span> <span class="hljs-title">bool</span>(<span class="hljs-params">ObjectHandle handle</span>)</span><br><span class="hljs-function"></span>    &#123;<br>        <span class="hljs-keyword">return</span> handle.IsValid();<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">explicit</span> <span class="hljs-keyword">operator</span> <span class="hljs-title">Object</span>(<span class="hljs-params">ObjectHandle handle</span>)</span><br><span class="hljs-function"></span>    &#123;<br>        <span class="hljs-keyword">return</span> handle ? handle.Object : <span class="hljs-literal">null</span>;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-built_in">bool</span> <span class="hljs-title">Equals</span>(<span class="hljs-params">ObjectHandle other</span>)</span><br><span class="hljs-function"></span>    &#123;<br>        <span class="hljs-keyword">return</span> CompareObjects(<span class="hljs-keyword">this</span>, other);<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">override</span> <span class="hljs-built_in">bool</span> <span class="hljs-title">Equals</span>(<span class="hljs-params"><span class="hljs-built_in">object</span> obj</span>)</span><br><span class="hljs-function"></span>    &#123;<br>        <span class="hljs-keyword">if</span> (!(obj <span class="hljs-keyword">is</span> ObjectHandle)) <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br><br>        <span class="hljs-keyword">return</span> Equals((ObjectHandle)obj);<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">bool</span> <span class="hljs-keyword">operator</span> ==(ObjectHandle lhs, ObjectHandle rhs)<br>    &#123;<br>        <span class="hljs-keyword">return</span> CompareObjects(lhs, rhs);<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">bool</span> <span class="hljs-keyword">operator</span> !=(ObjectHandle lhs, ObjectHandle rhs)<br>    &#123;<br>        <span class="hljs-keyword">return</span> !CompareObjects(lhs, rhs);<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">bool</span> <span class="hljs-title">CompareObjects</span>(<span class="hljs-params">ObjectHandle lhs, ObjectHandle rhs</span>)</span><br><span class="hljs-function"></span>    &#123;<br>        <span class="hljs-keyword">var</span> validA = lhs.IsValid();<br>        <span class="hljs-keyword">var</span> validB = rhs.IsValid();<br><br>        <span class="hljs-keyword">if</span> (validA &amp;&amp; !validB) <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>        <span class="hljs-keyword">if</span> (!validA &amp;&amp; validB) <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br><br>        <span class="hljs-keyword">return</span> lhs.m_CachedObjectID == rhs.m_CachedObjectID;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">override</span> <span class="hljs-built_in">int</span> <span class="hljs-title">GetHashCode</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        <span class="hljs-keyword">return</span> m_CachedObjectID;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
-<h2 id="数据的显示、编辑"><a href="#数据的显示、编辑" class="headerlink" title="数据的显示、编辑"></a>数据的显示、编辑</h2><p>unity的内置序列化还是比较好用的，所见即所得，但有个比较蛋疼的地方，不支持<code>接口、多态对象</code>。在设计数据结构的时候，如果没有多态，将会有很多数据冗余。。。</p>
-<p>在unity2020版本中，多了一个<code>SerializeReference</code>特性，可以帮助我们显示多态数据，但也有个比较蛋疼的地方，它只能显示，不能编辑，你说艹蛋不艹蛋🙄，做功能只做一半之unity。</p>
-<p>这里，我们使用Odin插件。如果没有Odin，可以考虑<a target="_blank" rel="noopener" href="https://github.com/TextusGames/UnitySerializedReferenceUI">UnitySerializedReferenceUI</a>。有了上面的基础，就可以在编辑器下快速创建、删除多态对象了！</p>
-<h3 id="不使用多态"><a href="#不使用多态" class="headerlink" title="不使用多态"></a>不使用多态</h3><figure class="highlight cs"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></div></td><td class="code"><pre><code class="hljs cs"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">data</span><br>&#123;<br>    <span class="hljs-comment">// event id</span><br>    <span class="hljs-keyword">public</span> uint id;<br><br>    <span class="hljs-comment">// animation event parameter</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">string</span> animationName;<br><br>    <span class="hljs-comment">// sound event parameter</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">string</span> soundName;<br><br>    <span class="hljs-comment">// more and more...</span><br>&#125;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">table</span><br>&#123;<br>    <span class="hljs-keyword">public</span> List&lt;data&gt; datas;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>动画事件只会用到animationName，声音事件只会用到soundName，但每个data都包含了其他无用字段，这真是太。。。</p>
-<p>如果在unityeditor下编辑，还得根据事件类型做switch case，只在面板中只曝露出有用的参数。。。不然。。。</p>
-<p>如果采用json、xml之类自动化的方式来保存，那无用的参数就全进文本了。。。手写parser？那慢慢写吧。。。</p>
-<h3 id="使用多态"><a href="#使用多态" class="headerlink" title="使用多态"></a>使用多态</h3><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs cs"><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">class</span> <span class="hljs-title">data</span><br>&#123;<br>    <span class="hljs-comment">// event id</span><br>    <span class="hljs-keyword">public</span> uint id;<br>&#125;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">animation_data</span> : <span class="hljs-title">data</span><br>&#123;<br>    <span class="hljs-comment">// animation event parameter</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">string</span> animationName;<br>&#125;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">sound_data</span> : <span class="hljs-title">data</span><br>&#123;<br>    <span class="hljs-comment">// sound event parameter</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">string</span> soundName;<br>&#125;<br><br><span class="hljs-comment">// more and more...</span><br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">table</span><br>&#123;<br>    <span class="hljs-keyword">public</span> List&lt;data&gt; datas;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>这样数据结构看起来就清晰多了，而且不会存储不必要的东西！文件大小、内存大小都会降低！也不用编写又臭又长的编辑器代码和序列化代码！</p>
-<h2 id="数据的读写"><a href="#数据的读写" class="headerlink" title="数据的读写"></a>数据的读写</h2><p>处理了显示、编辑的问题，另一个问题就是编辑器读取，以及运行时读写的问题了，不过一般运行时只考虑读。</p>
-<p>序列化库可以先选用 json.net 或者 protobuf.net，都支持多态序列化。</p>
-<p>数据的读写有个问题，我们可能在开发过程中修改数据结构，可能有以下几种问题：</p>
-<ol>
-<li>字段名改变</li>
-<li>基元类型改变，如，int-&gt;string</li>
-<li>容器类型改变，如，list-&gt;dictionary</li>
-<li>数据结构类改版，如，classA包含a、b、c，现要改为classA包含classB，classB包含a、b、c</li>
-</ol>
-<p>出现上述问题后，plan A，手动检查，重新弄。<s>策划：头伸过来，我给你加个buff。</s>哈哈哈~</p>
-<p>plan B，使用序列化库解决：</p>
-<ol>
-<li>字段名改变<br> protobuf使用int作为key，仅改变字段名，没有任何影响。<br> json.net则使用JsonProperty即可指定名称，类似unity的SerializeAs。</li>
-<li>剩下所有，可以考虑如下方案<br>被<code>（ProtoAfterDeserializaton、ProtoBeforeDeserializaton）、（OnSerializing、OnDeserialized）</code>等特性标记的方法可以在对应时机的被反射调用，所以利用这个，我们可以编写兼容代码，来最大化保证数据的兼容性！</li>
-</ol>
-<h2 id="坑点"><a href="#坑点" class="headerlink" title="坑点"></a>坑点</h2><p>Q: SerializeReference 在类名修改后，可能会出现报错，且编辑器下ScriptableObject无法保存。</p>
-<p>A: 由于我们是序列化成自己的数据文件了，则可以删掉后，再重新生成ScriptableObject</p>
-<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>有了以上基础，即可在unity里编辑逻辑数据，从了避免在excel里抽象数据结构了。</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>unity引擎的gc算法(BOEHM GC)过于古老，即使多了分帧机制，总gc时长并未被减少，甚至可能还增加了，对象池的使用还是很有必要。</p>
+<p>capcom的re引擎，也是c#作为脚本，也是il2cpp技术，但是gc的效率非常高，即使ps4上每帧分配300k左右的托管堆内存，每帧gc耗时依然可以保持0.2ms左右（cedec演讲，案例是鬼泣5）。这种gc作为后盾，开发效率可以大大提高！希望unity也能达到这种效果，造福广大开发者！</p>
 
             </div>
             <hr>
@@ -308,9 +282,11 @@
                   <div class="post-meta">
                     <i class="iconfont icon-tags"></i>
                     
+                      <a class="hover-with-bg" href="/tags/object-pool/">object pool</a>
+                    
                       <a class="hover-with-bg" href="/tags/unity/">unity</a>
                     
-                      <a class="hover-with-bg" href="/tags/gamedev/">gamedev</a>
+                      <a class="hover-with-bg" href="/tags/c/">c#</a>
                     
                   </div>
                 
@@ -327,15 +303,15 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2021/10/29/unity/%E5%9F%BA%E7%A1%80%E6%A1%86%E6%9E%B6/ugui%E7%BB%84%E4%BB%B6%E7%BB%91%E5%AE%9A%E5%92%8C%E4%BB%A3%E7%A0%81%E7%94%9F%E6%88%90/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">ugui组件绑定和代码生成</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
+                    
+                      <a href="/2022/01/14/unity/%E5%9F%BA%E7%A1%80%E6%A1%86%E6%9E%B6/%E6%95%B0%E6%8D%AE%E8%A1%A8/">
+                        <span class="hidden-mobile">数据表</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
                     
                   </article>
                 </div>
