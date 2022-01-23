@@ -399,35 +399,70 @@ $ hexo deploy<span aria-hidden="true" class="line-numbers-rows"><span></span><sp
 <p>$$(\sqrt{3x-1}+(1+x)^2)$$</p>
 <p>$$\sin(\alpha)^{\theta}=\sum_{i=0}^{n}(x^i + \cos(f))$$</p>
 <p>多行公式：</p>
-<p>$$<br>\displaystyle<br>\left( \sum_{k=1}^n a_k b_k \right)^2<br>\leq<br>\left( \sum_{k=1}^n a_k^2 \right)<br>\left( \sum_{k=1}^n b_k^2 \right)<br>$$</p>
-<p>$$<br>\displaystyle<br>    \frac{1}{<br>        \Bigl(\sqrt{\phi \sqrt{5}}-\phi\Bigr) e^{<br>        \frac25 \pi}} = 1+\frac{e^{-2\pi}} {1+\frac{e^{-4\pi}} {<br>        1+\frac{e^{-6\pi}}<br>        {1+\frac{e^{-8\pi}}<br>         {1+\cdots} }<br>        }<br>    }<br>$$</p>
-<p>$$<br>f(x) = \int_{-\infty}^\infty<br>    \hat f(\xi),e^{2 \pi i \xi x}<br>    ,d\xi<br>$$</p>
-<h3 id="绘制类图-Class-Diagram"><a href="#绘制类图-Class-Diagram" class="headerlink" title="绘制类图 Class Diagram"></a>绘制类图 Class Diagram</h3><pre class="line-numbers language-mermaid" data-language="mermaid"><code class="language-mermaid">classDiagram
-Class01 &lt;|-- AveryLongClass : Cool
+<div>
+$$
+\displaystyle
+\left( \sum\_{k=1}^n a\_k b\_k \right)^2
+\leq
+\left( \sum\_{k=1}^n a\_k^2 \right)
+\left( \sum\_{k=1}^n b\_k^2 \right)
+$$
+</div>
+
+<div>
+$$
+\displaystyle
+    \frac{1}{
+        \Bigl(\sqrt{\phi \sqrt{5}}-\phi\Bigr) e^{
+        \frac25 \pi}} = 1+\frac{e^{-2\pi}} {1+\frac{e^{-4\pi}} {
+        1+\frac{e^{-6\pi}}
+        {1+\frac{e^{-8\pi}}
+         {1+\cdots} }
+        }
+    }
+$$
+</div>
+
+<div>
+$$
+f(x) = \int_{-\infty}^\infty
+    \hat f(\xi)\,e^{2 \pi i \xi x}
+    \,d\xi
+$$
+</div>
+
+<h3 id="绘制类图-Class-Diagram"><a href="#绘制类图-Class-Diagram" class="headerlink" title="绘制类图 Class Diagram"></a>绘制类图 Class Diagram</h3><div class="mermaid">
+classDiagram
+Class01 <|-- AveryLongClass : Cool
 Class03 *-- Class04
 Class05 o-- Class06
 Class07 .. Class08
-Class09 --&gt; C2 : Where am i?
+Class09 --> C2 : Where am i?
 Class09 --* C3
-Class09 --|&gt; Class07
+Class09 --|> Class07
 Class07 : equals()
 Class07 : Object[] elementData
 Class01 : size()
 Class01 : int chimp
 Class01 : int gorilla
-Class08 &lt;--&gt; C2: Cool label<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+Class08 <--> C2: Cool label
+</div>
 
-<h3 id="绘制流程图-Flowchart"><a href="#绘制流程图-Flowchart" class="headerlink" title="绘制流程图 Flowchart"></a>绘制流程图 Flowchart</h3><pre class="line-numbers language-mermaid" data-language="mermaid"><code class="language-mermaid">graph TD;
-    A--&gt;B;
-    A--&gt;C;
-    B--&gt;D;
-    C--&gt;D;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="绘制流程图-Flowchart"><a href="#绘制流程图-Flowchart" class="headerlink" title="绘制流程图 Flowchart"></a>绘制流程图 Flowchart</h3><div class="mermaid">
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+</div>
 
-<h3 id="绘制序列图-Sequence-Diagram"><a href="#绘制序列图-Sequence-Diagram" class="headerlink" title="绘制序列图 Sequence Diagram"></a>绘制序列图 Sequence Diagram</h3><pre class="line-numbers language-mermaid" data-language="mermaid"><code class="language-mermaid">sequenceDiagram
-Andrew-&gt;China: Says Hello
+<h3 id="绘制序列图-Sequence-Diagram"><a href="#绘制序列图-Sequence-Diagram" class="headerlink" title="绘制序列图 Sequence Diagram"></a>绘制序列图 Sequence Diagram</h3><div class="mermaid">
+sequenceDiagram
+Andrew->China: Says Hello
 Note right of China: China thinks\nabout it
-China--&gt;Andrew: How are you?
-Andrew-&gt;&gt;China: I am good thanks!<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+China-->Andrew: How are you?
+Andrew->>China: I am good thanks!
+</div>
 
 <h3 id="End"><a href="#End" class="headerlink" title="End"></a>End</h3><h2 id="https-pandao-github-io-editor-md"><a href="#https-pandao-github-io-editor-md" class="headerlink" title="https://pandao.github.io/editor.md/"></a><a target="_blank" rel="noopener" href="https://pandao.github.io/editor.md/">https://pandao.github.io/editor.md/</a></h2></div><ul class="post-copyright"><li class="post-copyright-author"><strong>本文作者：</strong>Sarofc</li><li class="post-copyright-link"><strong>本文链接：</strong><a href="https://sarofc.gitee.io/2021/03/21/hello-hexo!/" title="Hello Hexo!">https://sarofc.gitee.io/2021/03/21/hello-hexo!/</a></li><li class="post-copyright-license"><strong>版权声明：</strong>本博客所有文章除特别声明外，均默认采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener" title="CC BY-NC-SA 4.0 "><svg class="icon"><use xlink:href="#icon-creative-commons-line"></use></svg><svg class="icon"><use xlink:href="#icon-creative-commons-by-line"></use></svg><svg class="icon"><use xlink:href="#icon-creative-commons-nc-line"></use></svg><svg class="icon"><use xlink:href="#icon-creative-commons-sa-line"></use></svg></a> 许可协议。</li></ul></section></article><div class="post-nav"><div class="post-nav-item"><a class="post-nav-prev" href="/2021/10/29/unity/%E5%9F%BA%E7%A1%80%E6%A1%86%E6%9E%B6/ugui%E7%BB%84%E4%BB%B6%E7%BB%91%E5%AE%9A%E5%92%8C%E4%BB%A3%E7%A0%81%E7%94%9F%E6%88%90/" rel="prev" title="ugui组件绑定和代码生成"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-arrow-left-s-line"></use></svg><span class="post-nav-text">ugui组件绑定和代码生成</span></a></div><div class="post-nav-item"><a class="post-nav-next" href="/2021/02/20/unity/%E7%BC%96%E8%BE%91%E5%99%A8%E6%89%A9%E5%B1%95/%E6%95%B0%E6%8D%AE%E7%9A%84%E7%BC%96%E8%BE%91%E5%92%8C%E8%AF%BB%E5%86%99/" rel="next" title="数据的编辑和读写"><span class="post-nav-text">数据的编辑和读写</span><svg class="icon" aria-hidden="true"><use xlink:href="#icon-arrow-right-s-line"></use></svg></a></div></div></div><div class="hty-card" id="comment"><div class="comment-tooltip text-center"><span>要不要和我说些什么？</span><br></div><div class="toggle-comment-system" style="margin: 1rem auto"><a class="toggle-comment-btn hty-button hty-button--raised text-uppercase" data-target="#valine-container" onclick="showComment(this.dataset.target)">valine</a><style>.utterances {
   display: none;
