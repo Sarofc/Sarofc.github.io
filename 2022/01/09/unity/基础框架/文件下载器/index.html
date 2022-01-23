@@ -1,266 +1,35 @@
-
-
-<!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=auto>
-
-
-
-<head>
-  <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/myfavicon.png">
-  <link rel="icon" href="/img/myfavicon.ico">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  
-  <meta name="theme-color" content="#2f4154">
-  <meta name="author" content="Sarofc">
-  <meta name="keywords" content="">
-  
-    <meta name="description" content="基于 HttpWebRequest 和 UnityWebRequest 的多线程、断点续传文件下载器 设计  IDonwloadAgent为下载器接口，目前有两种实现，HttpDownload和UnityWebRequestDownload，可以无缝切换。IDonwloadAgent继承IEnumerator接口，可以无缝接入unity协程、UniTask(Async)，实现非回调式异步等待，逻辑">
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#0078E7"><meta name="author" content="Sarofc"><meta name="copyright" content="Sarofc"><meta name="generator" content="Hexo 6.0.0"><meta name="theme" content="hexo-theme-yun"><title>文件下载器 | Sarofc's Blog</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@900&amp;display=swap" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/star-markdown-css@0.1.25/dist/yun/yun-markdown.min.css"><script src="//at.alicdn.com/t/font_1140697_dxory92pb0h.js" async></script><script src="https://cdn.jsdelivr.net/npm/scrollreveal/dist/scrollreveal.min.js" defer></script><script>function initScrollReveal() {
+  [".post-card",".post-content img"].forEach((target)=> {
+    ScrollReveal().reveal(target);
+  })
+}
+document.addEventListener("DOMContentLoaded", initScrollReveal);
+document.addEventListener("pjax:success", initScrollReveal);
+</script><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css"><script defer src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/contrib/copy-tex.min.css"><script defer src="https://cdn.jsdelivr.net/npm/katex@latest/dist/contrib/copy-tex.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@latest/dist/contrib/auto-render.min.js"></script><script>document.addEventListener("DOMContentLoaded", () => {
+  Yun.utils.renderKatex();
+});</script><link class="aplayer-style-marker" rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/aplayer@latest/dist/APlayer.min.css"><script class="aplayer-script-marker" src="https://cdn.jsdelivr.net/npm/aplayer@latest/dist/APlayer.min.js" defer></script><script class="meting-script-marker" src="https://cdn.jsdelivr.net/npm/meting@1/dist/Meting.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/pjax@latest/pjax.min.js" defer></script><script src="/js/pjax.js" defer></script><script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script><link id="light-prism-css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@latest/themes/prism.css" media="(prefers-color-scheme: light)"><link id="dark-prism-css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@latest/themes/prism-tomorrow.css" media="(prefers-color-scheme: dark)"><link rel="icon" type="image/png" href="/img/myfavicon.ico"><link rel="mask-icon" href="/img/myfavicon.ico" color="#0078E7"><link rel="preload" href="/css/hexo-theme-yun.css" as="style"><link rel="preload" href="/js/utils.js" as="script"><link rel="preload" href="/js/hexo-theme-yun.js" as="script"><link rel="prefetch" href="/js/sidebar.js" as="script"><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><script id="yun-config">
+    const Yun = window.Yun || {};
+    window.CONFIG = {"hostname":"sarofc.gitee.io","root":"/","title":"温暖的晨光，散去了忧伤","version":"1.7.0","mode":"auto","copycode":true,"page":{"isPost":true},"i18n":{"placeholder":"搜索...","empty":"找不到您查询的内容: ${query}","hits":"找到 ${hits} 条结果","hits_time":"找到 ${hits} 条结果（用时 ${time} 毫秒）"},"anonymous_image":"https://cdn.jsdelivr.net/gh/YunYouJun/cdn/img/avatar/none.jpg","say":{"api":"/data/sentences.json"},"local_search":{"path":"/search.xml"},"fireworks":{"colors":["102, 167, 221","62, 131, 225","33, 78, 194"]}};
+  </script><link rel="stylesheet" href="/css/hexo-theme-yun.css"><script src="/js/utils.js"></script><script src="/js/hexo-theme-yun.js"></script><meta name="description" content="基于 HttpWebRequest 和 UnityWebRequest 的多线程、断点续传文件下载器 设计  IDonwloadAgent为下载器接口，目前有两种实现，HttpDownload和UnityWebRequestDownload，可以无缝切换。IDonwloadAgent继承IEnumerator接口，可以无缝接入unity协程、UniTask(Async)，实现非回调式异步等待，逻辑">
 <meta property="og:type" content="article">
 <meta property="og:title" content="文件下载器">
 <meta property="og:url" content="https://sarofc.gitee.io/2022/01/09/unity/%E5%9F%BA%E7%A1%80%E6%A1%86%E6%9E%B6/%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD%E5%99%A8/index.html">
 <meta property="og:site_name" content="Sarofc&#39;s Blog">
 <meta property="og:description" content="基于 HttpWebRequest 和 UnityWebRequest 的多线程、断点续传文件下载器 设计  IDonwloadAgent为下载器接口，目前有两种实现，HttpDownload和UnityWebRequestDownload，可以无缝切换。IDonwloadAgent继承IEnumerator接口，可以无缝接入unity协程、UniTask(Async)，实现非回调式异步等待，逻辑">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://sarofc.gitee.io/img/index/%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD%E5%99%A8.png">
+<meta property="og:image" content="https://sarofc.gitee.io/img/index/文件下载器.png">
 <meta property="article:published_time" content="2022-01-09T10:48:35.000Z">
 <meta property="article:modified_time" content="2022-01-09T10:48:35.000Z">
 <meta property="article:author" content="Sarofc">
 <meta property="article:tag" content="unity">
 <meta property="article:tag" content="c#">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://sarofc.gitee.io/img/index/%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD%E5%99%A8.png">
-  
-  
-  <title>文件下载器 - Sarofc&#39;s Blog</title>
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
-    
-    
-      
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
-    
-  
-
-  
-    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
-  
-
-
-<!-- 主题依赖的图标库，不要自行修改 -->
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
-
-
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
-
-  
-<link rel="stylesheet" href="/css/shubiao.css">
-
-
-
-  <script id="fluid-configs">
-    var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"sarofc.gitee.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":160,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
-  </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
-<meta name="generator" content="Hexo 6.0.0"></head>
-
-
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand" href="/">
-      <strong>Sarofc&#39;s Blog</strong>
-    </a>
-
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
-
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/categories/">
-                <i class="iconfont icon-category-fill"></i>
-                分类
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
-              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
-            </a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-</nav>
-
-    <div class="banner" id="banner" parallax=true
-         style="background: url('/img/blog_banner.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="文件下载器">
-              
-            </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2022-01-09 18:48" pubdate>
-        2022年1月9日 晚上
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      10k 字
-    </span>
-  
-
-  
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      88 分钟
-    </span>
-  
-
-  
-  
-    
-      <!-- 不蒜子统计文章PV -->
-      <span id="busuanzi_container_page_pv" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="busuanzi_value_page_pv"></span> 次
-      </span>
-    
-  
-</div>
-
-            
-          </div>
-
-          
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    
-      
-
-<div class="container-fluid nopadding-x">
-  <div class="row nomargin-x">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-x-md">
-      <div class="container nopadding-x-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">文件下载器</h1>
-            
-              <p class="note note-info">
-                
-                  本文最后更新于：13 天前
-                
-              </p>
-            
-            <div class="markdown-body">
-              <p>基于 <code>HttpWebRequest</code> 和 <code>UnityWebRequest</code> 的多线程、断点续传文件下载器</p>
-<h2 id="设计"><a href="#设计" class="headerlink" title="设计"></a>设计</h2><img src="/img/index/文件下载器.png" srcset="/img/loading.gif" lazyload>
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sarofc.gitee.io/img/index/文件下载器.png"><script src="/js/ui/mode.js"></script><script>Yun.utils.getScript("https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js", () => {
+  const mermaidOptions = {"startOnload":true}
+  mermaid.initialize(mermaidOptions);
+}, window.mermaid);
+</script><style>.mermaid{background: transparent;}</style></head><body><script defer src="https://cdn.jsdelivr.net/npm/animejs@latest"></script><script defer src="/js/ui/fireworks.js"></script><canvas class="fireworks"></canvas><div class="container"><a class="sidebar-toggle hty-icon-button" id="menu-btn"><div class="hamburger hamburger--spin" type="button"><span class="hamburger-box"><span class="hamburger-inner"></span></span></div></a><div class="sidebar-toggle sidebar-overlay"></div><aside class="sidebar"><script src="/js/sidebar.js"></script><ul class="sidebar-nav"><li class="sidebar-nav-item sidebar-nav-toc hty-icon-button sidebar-nav-active" data-target="post-toc-wrap" title="文章目录"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-list-ordered"></use></svg></li><li class="sidebar-nav-item sidebar-nav-overview hty-icon-button" data-target="site-overview-wrap" title="站点概览"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-passport-line"></use></svg></li></ul><div class="sidebar-panel" id="site-overview-wrap"><div class="site-info fix-top"><a class="site-author-avatar" href="/about/" title="Sarofc"><img width="96" loading="lazy" src="/img/myfavicon.ico" alt="Sarofc"><span class="site-author-status" title="No Game No Life">😊</span></a><div class="site-author-name"><a href="/about/">Sarofc</a></div><span class="site-name">Sarofc's Blog</span><sub class="site-subtitle"></sub><div class="site-desciption"></div></div><nav class="site-state"><a class="site-state-item hty-icon-button icon-home" href="/" title="首页"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-home-4-line"></use></svg></span></a><div class="site-state-item"><a href="/archives/" title="归档"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-archive-line"></use></svg></span><span class="site-state-item-count">12</span></a></div><div class="site-state-item"><a href="/categories/" title="分类"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-folder-2-line"></use></svg></span><span class="site-state-item-count">3</span></a></div><div class="site-state-item"><a href="/tags/" title="标签"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-price-tag-3-line"></use></svg></span><span class="site-state-item-count">15</span></a></div><a class="site-state-item hty-icon-button" href="/about/#comment" title="留言板"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-clipboard-line"></use></svg></span></a></nav><hr style="margin-bottom:0.5rem"><div class="links-of-author"><a class="links-of-author-item hty-icon-button" rel="noopener" href="https://github.com/Sarofc" title="GitHub" target="_blank" style="color:#6e5494"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-github-line"></use></svg></a><a class="links-of-author-item hty-icon-button" rel="noopener" href="https://space.bilibili.com/29047160" title="哔哩哔哩" target="_blank" style="color:#FF8EB3"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-bilibili-line"></use></svg></a></div><br><a class="links-item hty-icon-button" id="toggle-mode-btn" href="javascript:;" title="Mode" style="color: #f1cb64"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-contrast-2-line"></use></svg></a></div><div class="sidebar-panel sidebar-panel-active" id="post-toc-wrap"><div class="post-toc"><div class="post-toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1"><span class="toc-number">1.</span> <span class="toc-text">设计</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%8B%E8%BD%BD%E5%99%A8%E5%AE%9E%E7%8E%B0"><span class="toc-number">2.</span> <span class="toc-text">下载器实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#HttpDownload"><span class="toc-number">2.1.</span> <span class="toc-text">HttpDownload</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UnityWebRequestDownload"><span class="toc-number">2.2.</span> <span class="toc-text">UnityWebRequestDownload</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Github"><span class="toc-number">3.</span> <span class="toc-text">Github</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-number">4.</span> <span class="toc-text">参考</span></a></li></ol></div></div></div><div class="tag-cloud"><div class="tag-cloud-tags"><a href="/tags/asset/" style="font-size: 12px; color: #999">asset</a> <a href="/tags/c/" style="font-size: 21px; color: #4d89c0">c#</a> <a href="/tags/codegen/" style="font-size: 12px; color: #999">codegen</a> <a href="/tags/excel/" style="font-size: 12px; color: #999">excel</a> <a href="/tags/gamedev/" style="font-size: 25.5px; color: #2680d4">gamedev</a> <a href="/tags/gameplay/" style="font-size: 16.5px; color: #7391ad">gameplay</a> <a href="/tags/gameplaytag/" style="font-size: 16.5px; color: #7391ad">gameplaytag</a> <a href="/tags/hexo/" style="font-size: 12px; color: #999">hexo</a> <a href="/tags/markdown/" style="font-size: 12px; color: #999">markdown</a> <a href="/tags/object-pool/" style="font-size: 12px; color: #999">object pool</a> <a href="/tags/ugui/" style="font-size: 12px; color: #999">ugui</a> <a href="/tags/unity/" style="font-size: 30px; color: #0078e7">unity</a> <a href="/tags/unity-gamedev/" style="font-size: 12px; color: #999">unity gamedev</a> <a href="/tags/vfs/" style="font-size: 12px; color: #999">vfs</a> <a href="/tags/%E8%99%9A%E6%8B%9F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" style="font-size: 12px; color: #999">虚拟文件系统</a></div></div></aside><main class="sidebar-translate" id="content"><div id="post"><article class="hty-card post-block" itemscope itemtype="https://schema.org/Article"><link itemprop="mainEntityOfPage" href="https://sarofc.gitee.io/2022/01/09/unity/%E5%9F%BA%E7%A1%80%E6%A1%86%E6%9E%B6/%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD%E5%99%A8/"><span hidden itemprop="author" itemscope itemtype="https://schema.org/Person"><meta itemprop="name" content="Sarofc"><meta itemprop="description"></span><span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization"><meta itemprop="name" content="Sarofc's Blog"></span><header class="post-header"><h1 class="post-title" itemprop="name headline">文件下载器</h1><div class="post-meta"><div class="post-time" style="display:block"><span class="post-meta-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-calendar-line"></use></svg></span> <time title="创建时间：2022-01-09 18:48:35" itemprop="dateCreated datePublished" datetime="2022-01-09T18:48:35+08:00">2022-01-09</time></div><span class="post-count"><span class="post-symbolcount"><span class="post-meta-item-icon" title="本文字数"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-file-word-line"></use></svg></span> <span title="本文字数">1.5k</span><span class="post-meta-divider">-</span><span class="post-meta-item-icon" title="阅读时长"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-timer-line"></use></svg></span> <span title="阅读时长">8m</span></span></span><span class="post-busuanzi"><span class="post-meta-divider">-</span><span class="post-meta-item-icon" title="阅读次数"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-eye-line"></use></svg> <span id="busuanzi_value_page_pv"></span></span></span><div class="post-classify"><span class="post-category"> <span class="post-meta-item-icon" style="margin-right:3px;"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-folder-line"></use></svg></span><span itemprop="about" itemscope itemtype="https://schema.org/Thing"><a class="category-item" href="/categories/unity/" style="--text-color:var(--hty-text-color)" itemprop="url" rel="index"><span itemprop="text">unity</span></a></span></span><span class="post-tag"><span class="post-meta-divider">-</span><a class="tag-item" href="/tags/unity/" style="--text-color:var(--hty-text-color)"><span class="post-meta-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-price-tag-3-line"></use></svg></span><span class="tag-name">unity</span></a><a class="tag-item" href="/tags/c/" style="--text-color:var(--hty-text-color)"><span class="post-meta-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-price-tag-3-line"></use></svg></span><span class="tag-name">c#</span></a></span></div></div></header><section class="post-body" itemprop="articleBody"><div class="post-content markdown-body" style="--smc-primary:#0078E7;"><p>基于 <code>HttpWebRequest</code> 和 <code>UnityWebRequest</code> 的多线程、断点续传文件下载器</p>
+<h2 id="设计"><a href="#设计" class="headerlink" title="设计"></a>设计</h2><img src="/img/index/文件下载器.png" loading="lazy">
 
 <p><code>IDonwloadAgent</code>为下载器接口，目前有两种实现，HttpDownload和UnityWebRequestDownload，可以无缝切换。IDonwloadAgent继承IEnumerator接口，可以无缝接入unity协程、UniTask(Async)，实现非回调式异步等待，逻辑更清晰。IDonwloadAgent提供各种操作接口供Downloader调用，例如开始、暂停、重试、取消等等。</p>
 <p><code>Downloader</code>为工厂模式实现，管理所有下载器实例，避免重复下载，等等。通过DownloadAsync(DownloadInfo)，即可异步下载文件。覆写s_OnDownloadAgentFactory委托，可以使用自定义IDownloadAgent实例。</p>
@@ -271,7 +40,258 @@
 <li>修改buffer大小，貌似可以达成限速效果。</li>
 </ol>
 <p>以下为完整实现</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br></pre></div></td><td class="code"><pre><code class="hljs csharp"><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">sealed</span> <span class="hljs-keyword">class</span> <span class="hljs-title">HttpDownload</span> : <span class="hljs-title">IDownloadAgent</span><br>&#123;<br>    <span class="hljs-comment">// 通过buffer size 貌似可以限速？</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">long</span> s_ReadBufferSize = <span class="hljs-number">1024</span> * <span class="hljs-number">64</span>;<br><br>    <span class="hljs-meta">#<span class="hljs-meta-keyword">region</span> Instance</span><br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> <span class="hljs-built_in">byte</span>[] m_ReadBuffer = <span class="hljs-keyword">new</span> <span class="hljs-built_in">byte</span>[s_ReadBufferSize];<br>    <span class="hljs-keyword">private</span> FileStream m_Writer;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">HttpDownload</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        Status = EDownloadStatus.Wait;<br>        Position = <span class="hljs-number">0</span>;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> DownloadInfo Info &#123; <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; &#125;<br>    <span class="hljs-keyword">public</span> EDownloadStatus Status &#123; <span class="hljs-keyword">get</span>; <span class="hljs-keyword">private</span> <span class="hljs-keyword">set</span>; &#125;<br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">string</span> Error &#123; <span class="hljs-keyword">get</span>; <span class="hljs-keyword">private</span> <span class="hljs-keyword">set</span>; &#125;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">event</span> Action&lt;IDownloadAgent&gt; Completed;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">bool</span> IsDone =&gt; Status == EDownloadStatus.Failed || Status == EDownloadStatus.Success;<br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">float</span> Progress =&gt; Position * <span class="hljs-number">1f</span> / Info.Size;<br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">long</span> Position &#123; <span class="hljs-keyword">get</span>; <span class="hljs-keyword">private</span> <span class="hljs-keyword">set</span>; &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Retry</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        Status = EDownloadStatus.Wait;<br>        Start();<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Resume</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        Retry();<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Pause</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        Status = EDownloadStatus.Wait;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Cancel</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        Error = <span class="hljs-string">&quot;User Cancel.&quot;</span>;<br>        Status = EDownloadStatus.Failed;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Complete</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        <span class="hljs-keyword">if</span> (Completed != <span class="hljs-literal">null</span>)<br>        &#123;<br>            Completed(<span class="hljs-keyword">this</span>);<br>            Completed = <span class="hljs-literal">null</span>;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Update</span>(<span class="hljs-params"></span>)</span> &#123; &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Run</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        <span class="hljs-keyword">try</span><br>        &#123;<br>            Downloading();<br>            CloseWrite();<br><br>            <span class="hljs-keyword">if</span> (Status == EDownloadStatus.Wait) <span class="hljs-keyword">return</span>;<br><br>            <span class="hljs-keyword">if</span> (Status == EDownloadStatus.Failed) <span class="hljs-keyword">return</span>;<br><br>            <span class="hljs-keyword">if</span> (Position != Info.Size)<br>            &#123;<br>                Error = <span class="hljs-string">$&quot;Download length <span class="hljs-subst">&#123;Position&#125;</span> mismatch to <span class="hljs-subst">&#123;Info.Size&#125;</span>&quot;</span>;<br>                Status = EDownloadStatus.Failed;<br><br>                <span class="hljs-keyword">return</span>;<br>            &#125;<br><br>            Status = EDownloadStatus.Success;<br>        &#125;<br>        catch (Exception e)<br>        &#123;<br>            Error = e.Message;<br>            Status = EDownloadStatus.Failed;<br>        &#125;<br>        <span class="hljs-keyword">finally</span><br>        &#123;<br>            CloseWrite();<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">CloseWrite</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        <span class="hljs-keyword">if</span> (m_Writer != <span class="hljs-literal">null</span>)<br>        &#123;<br>            m_Writer.Flush();<br>            m_Writer.Close();<br>            m_Writer = <span class="hljs-literal">null</span>;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">bool</span> <span class="hljs-title">CheckValidationResult</span>(<span class="hljs-params"><span class="hljs-built_in">object</span> sender, X509Certificate certificate, X509Chain chain,</span></span><br><span class="hljs-function"><span class="hljs-params">        SslPolicyErrors spe</span>)</span><br><span class="hljs-function"></span>    &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Downloading</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        <span class="hljs-comment">// TODO</span><br>        <span class="hljs-comment">// 下载中，长时间没速度，也应该进行处理</span><br><br>        <span class="hljs-keyword">var</span> request = CreateWebRequest();<br>        <span class="hljs-keyword">using</span> (<span class="hljs-keyword">var</span> response = request.GetResponse())<br>        &#123;<br>            <span class="hljs-keyword">if</span> (response.ContentLength &gt; <span class="hljs-number">0</span>)<br>            &#123;<br>                <span class="hljs-keyword">if</span> (Info.Size == <span class="hljs-number">0</span>) Info.Size = response.ContentLength + Position;<br><br>                <span class="hljs-keyword">using</span> (<span class="hljs-keyword">var</span> reader = response.GetResponseStream())<br>                &#123;<br>                    <span class="hljs-keyword">if</span> (Position &lt; Info.Size)<br>                    &#123;<br>                        <span class="hljs-keyword">while</span> (Status == EDownloadStatus.Progressing)<br>                        &#123;<br>                            <span class="hljs-keyword">if</span> (ReadToEnd(reader))<br>                            &#123;<br>                                <span class="hljs-keyword">break</span>;<br>                            &#125;<br>                        &#125;<br>                    &#125;<br>                &#125;<br>            &#125;<br>            <span class="hljs-keyword">else</span><br>            &#123;<br>                Status = EDownloadStatus.Success;<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> WebRequest <span class="hljs-title">CreateWebRequest</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        WebRequest request;<br>        <span class="hljs-keyword">if</span> (Info.DownloadUrl.StartsWith(<span class="hljs-string">&quot;https&quot;</span>, StringComparison.OrdinalIgnoreCase))<br>        &#123;<br>            ServicePointManager.ServerCertificateValidationCallback = CheckValidationResult;<br>            request = GetHttpWebRequest();<br>        &#125;<br>        <span class="hljs-keyword">else</span><br>        &#123;<br>            request = GetHttpWebRequest();<br>        &#125;<br><br>        <span class="hljs-keyword">return</span> request;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> WebRequest <span class="hljs-title">GetHttpWebRequest</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        <span class="hljs-keyword">var</span> httpWebRequest = (HttpWebRequest)WebRequest.Create(Info.DownloadUrl);<br>        httpWebRequest.ProtocolVersion = HttpVersion.Version11;<br><br>        <span class="hljs-keyword">var</span> <span class="hljs-keyword">from</span> = Info.Offset + Position;<br>        <span class="hljs-keyword">var</span> to = Info.Offset + Info.Size;<br><br>        httpWebRequest.AddRange(<span class="hljs-keyword">from</span>, to);<br><br>        <span class="hljs-comment">// TODO 加上超时</span><br>        <span class="hljs-comment">//httpWebRequest.Timeout = 1000000; // 默认是1000s</span><br><br>        <span class="hljs-keyword">return</span> httpWebRequest;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-built_in">bool</span> <span class="hljs-title">ReadToEnd</span>(<span class="hljs-params">Stream reader</span>)</span><br><span class="hljs-function"></span>    &#123;<br>        <span class="hljs-keyword">var</span> len = reader.Read(m_ReadBuffer, <span class="hljs-number">0</span>, m_ReadBuffer.Length);<br>        <span class="hljs-keyword">if</span> (len &gt; <span class="hljs-number">0</span>)<br>        &#123;<br>            m_Writer.Write(m_ReadBuffer, <span class="hljs-number">0</span>, len);<br>            Position += len;<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>        &#125;<br><br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Start</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        <span class="hljs-keyword">if</span> (Status != EDownloadStatus.Wait) <span class="hljs-keyword">return</span>;<br><br>        Status = EDownloadStatus.Progressing;<br>        <span class="hljs-keyword">var</span> fileInfo = <span class="hljs-keyword">new</span> FileInfo(Info.SavePath);<br><br>        <span class="hljs-keyword">if</span> (fileInfo.Exists &amp;&amp; fileInfo.Length &gt; <span class="hljs-number">0</span>)<br>        &#123;<br>            <span class="hljs-keyword">if</span> (Info.Size &gt; <span class="hljs-number">0</span> &amp;&amp; fileInfo.Length == Info.Size)<br>            &#123;<br>                Status = EDownloadStatus.Success;<br>                Position = Info.Size;<br>                <span class="hljs-keyword">return</span>;<br>            &#125;<br><br>            <span class="hljs-comment">// TODO</span><br>            <span class="hljs-comment">// issue：</span><br>            <span class="hljs-comment">// IOException: Sharing violation on path</span><br>            <span class="hljs-comment">// 文件读取了多次</span><br>            <span class="hljs-keyword">if</span> (m_Writer == <span class="hljs-literal">null</span>)<br>                m_Writer = fileInfo.OpenWrite();<br><br>            Position = m_Writer.Length - <span class="hljs-number">1</span>;<br><br>            <span class="hljs-keyword">if</span> (!Info.IsValid(Position))<br>            &#123;<br>                Error = <span class="hljs-string">$&quot;Invalid Range [<span class="hljs-subst">&#123;Info.Offset + Position &#125;</span>-<span class="hljs-subst">&#123; Info.Offset + Position + Info.Size&#125;</span>]&quot;</span>;<br>                Status = EDownloadStatus.Failed;<br>                <span class="hljs-keyword">return</span>;<br>            &#125;<br><br>            <span class="hljs-keyword">if</span> (Position &gt; <span class="hljs-number">0</span>) m_Writer.Seek(<span class="hljs-number">-1</span>, SeekOrigin.End);<br>        &#125;<br>        <span class="hljs-keyword">else</span><br>        &#123;<br>            <span class="hljs-keyword">if</span> (!Info.IsValid(Position))<br>            &#123;<br>                Error = <span class="hljs-string">$&quot;Invalid Range [<span class="hljs-subst">&#123;Info.Offset + Position &#125;</span>-<span class="hljs-subst">&#123; Info.Offset + Position + Info.Size&#125;</span>]&quot;</span>;<br>                Status = EDownloadStatus.Failed;<br>                <span class="hljs-keyword">return</span>;<br>            &#125;<br><br><br>            <span class="hljs-keyword">var</span> dir = Path.GetDirectoryName(Info.SavePath);<br>            <span class="hljs-keyword">if</span> (!<span class="hljs-built_in">string</span>.IsNullOrEmpty(dir) &amp;&amp; !Directory.Exists(dir)) Directory.CreateDirectory(dir);<br><br>            m_Writer = File.Create(Info.SavePath);<br>            Position = <span class="hljs-number">0</span>;<br>        &#125;<br><br>        Task.Run(Run);<br>    &#125;<br><br>    <span class="hljs-meta">#<span class="hljs-meta-keyword">endregion</span></span><br><br>    <span class="hljs-meta">#<span class="hljs-meta-keyword">region</span> IEnumerator Impl</span><br><br>    <span class="hljs-built_in">bool</span> IEnumerator.MoveNext() =&gt; !IsDone;<br><br>    <span class="hljs-keyword">void</span> IEnumerator.Reset()<br>    &#123; &#125;<br><br>    <span class="hljs-built_in">object</span> IEnumerator.Current =&gt; <span class="hljs-literal">null</span>;<br><br>    <span class="hljs-meta">#<span class="hljs-meta-keyword">endregion</span></span><br>&#125;<br></code></pre></td></tr></table></figure>
+<pre class="line-numbers language-csharp" data-language="csharp"><code class="language-csharp">
+<span class="token keyword">public</span> <span class="token keyword">sealed</span> <span class="token keyword">class</span> <span class="token class-name">HttpDownload</span> <span class="token punctuation">:</span> <span class="token type-list"><span class="token class-name">IDownloadAgent</span></span>
+<span class="token punctuation">&#123;</span>
+    <span class="token comment">// 通过buffer size 貌似可以限速？</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token class-name"><span class="token keyword">long</span></span> s_ReadBufferSize <span class="token operator">=</span> <span class="token number">1024</span> <span class="token operator">*</span> <span class="token number">64</span><span class="token punctuation">;</span>
+
+    <span class="token preprocessor property">#<span class="token directive keyword">region</span> Instance</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">readonly</span> <span class="token class-name"><span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span></span> m_ReadBuffer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token constructor-invocation class-name"><span class="token keyword">byte</span></span><span class="token punctuation">[</span>s_ReadBufferSize<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token class-name">FileStream</span> m_Writer<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token function">HttpDownload</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        Status <span class="token operator">=</span> EDownloadStatus<span class="token punctuation">.</span>Wait<span class="token punctuation">;</span>
+        Position <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token return-type class-name">DownloadInfo</span> Info <span class="token punctuation">&#123;</span> <span class="token keyword">get</span><span class="token punctuation">;</span> <span class="token keyword">set</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+    <span class="token keyword">public</span> <span class="token return-type class-name">EDownloadStatus</span> Status <span class="token punctuation">&#123;</span> <span class="token keyword">get</span><span class="token punctuation">;</span> <span class="token keyword">private</span> <span class="token keyword">set</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">string</span></span> Error <span class="token punctuation">&#123;</span> <span class="token keyword">get</span><span class="token punctuation">;</span> <span class="token keyword">private</span> <span class="token keyword">set</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+    <span class="token keyword">public</span> <span class="token keyword">event</span> <span class="token class-name">Action<span class="token punctuation">&lt;</span>IDownloadAgent<span class="token punctuation">></span></span> Completed<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">bool</span></span> IsDone <span class="token operator">=></span> Status <span class="token operator">==</span> EDownloadStatus<span class="token punctuation">.</span>Failed <span class="token operator">||</span> Status <span class="token operator">==</span> EDownloadStatus<span class="token punctuation">.</span>Success<span class="token punctuation">;</span>
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">float</span></span> Progress <span class="token operator">=></span> Position <span class="token operator">*</span> <span class="token number">1f</span> <span class="token operator">/</span> Info<span class="token punctuation">.</span>Size<span class="token punctuation">;</span>
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">long</span></span> Position <span class="token punctuation">&#123;</span> <span class="token keyword">get</span><span class="token punctuation">;</span> <span class="token keyword">private</span> <span class="token keyword">set</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">private</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Retry</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        Status <span class="token operator">=</span> EDownloadStatus<span class="token punctuation">.</span>Wait<span class="token punctuation">;</span>
+        <span class="token function">Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Resume</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token function">Retry</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Pause</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        Status <span class="token operator">=</span> EDownloadStatus<span class="token punctuation">.</span>Wait<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Cancel</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        Error <span class="token operator">=</span> <span class="token string">"User Cancel."</span><span class="token punctuation">;</span>
+        Status <span class="token operator">=</span> EDownloadStatus<span class="token punctuation">.</span>Failed<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Complete</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>Completed <span class="token operator">!=</span> <span class="token keyword">null</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token function">Completed</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            Completed <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Update</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">private</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Run</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token keyword">try</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token function">Downloading</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">CloseWrite</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>Status <span class="token operator">==</span> EDownloadStatus<span class="token punctuation">.</span>Wait<span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>Status <span class="token operator">==</span> EDownloadStatus<span class="token punctuation">.</span>Failed<span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>Position <span class="token operator">!=</span> Info<span class="token punctuation">.</span>Size<span class="token punctuation">)</span>
+            <span class="token punctuation">&#123;</span>
+                Error <span class="token operator">=</span> <span class="token interpolation-string"><span class="token string">$"Download length </span><span class="token interpolation"><span class="token punctuation">&#123;</span><span class="token expression language-csharp">Position</span><span class="token punctuation">&#125;</span></span><span class="token string"> mismatch to </span><span class="token interpolation"><span class="token punctuation">&#123;</span><span class="token expression language-csharp">Info<span class="token punctuation">.</span>Size</span><span class="token punctuation">&#125;</span></span><span class="token string">"</span></span><span class="token punctuation">;</span>
+                Status <span class="token operator">=</span> EDownloadStatus<span class="token punctuation">.</span>Failed<span class="token punctuation">;</span>
+
+                <span class="token keyword">return</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+
+            Status <span class="token operator">=</span> EDownloadStatus<span class="token punctuation">.</span>Success<span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            Error <span class="token operator">=</span> e<span class="token punctuation">.</span>Message<span class="token punctuation">;</span>
+            Status <span class="token operator">=</span> EDownloadStatus<span class="token punctuation">.</span>Failed<span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        <span class="token keyword">finally</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token function">CloseWrite</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">private</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">CloseWrite</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>m_Writer <span class="token operator">!=</span> <span class="token keyword">null</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            m_Writer<span class="token punctuation">.</span><span class="token function">Flush</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            m_Writer<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            m_Writer <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token return-type class-name"><span class="token keyword">bool</span></span> <span class="token function">CheckValidationResult</span><span class="token punctuation">(</span><span class="token class-name"><span class="token keyword">object</span></span> sender<span class="token punctuation">,</span> <span class="token class-name">X509Certificate</span> certificate<span class="token punctuation">,</span> <span class="token class-name">X509Chain</span> chain<span class="token punctuation">,</span>
+        <span class="token class-name">SslPolicyErrors</span> spe<span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">private</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Downloading</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token comment">// TODO</span>
+        <span class="token comment">// 下载中，长时间没速度，也应该进行处理</span>
+
+        <span class="token class-name"><span class="token keyword">var</span></span> request <span class="token operator">=</span> <span class="token function">CreateWebRequest</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">using</span> <span class="token punctuation">(</span><span class="token class-name"><span class="token keyword">var</span></span> response <span class="token operator">=</span> request<span class="token punctuation">.</span><span class="token function">GetResponse</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>response<span class="token punctuation">.</span>ContentLength <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span>
+            <span class="token punctuation">&#123;</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>Info<span class="token punctuation">.</span>Size <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> Info<span class="token punctuation">.</span>Size <span class="token operator">=</span> response<span class="token punctuation">.</span>ContentLength <span class="token operator">+</span> Position<span class="token punctuation">;</span>
+
+                <span class="token keyword">using</span> <span class="token punctuation">(</span><span class="token class-name"><span class="token keyword">var</span></span> reader <span class="token operator">=</span> response<span class="token punctuation">.</span><span class="token function">GetResponseStream</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token punctuation">&#123;</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>Position <span class="token operator">&lt;</span> Info<span class="token punctuation">.</span>Size<span class="token punctuation">)</span>
+                    <span class="token punctuation">&#123;</span>
+                        <span class="token keyword">while</span> <span class="token punctuation">(</span>Status <span class="token operator">==</span> EDownloadStatus<span class="token punctuation">.</span>Progressing<span class="token punctuation">)</span>
+                        <span class="token punctuation">&#123;</span>
+                            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">ReadToEnd</span><span class="token punctuation">(</span>reader<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                            <span class="token punctuation">&#123;</span>
+                                <span class="token keyword">break</span><span class="token punctuation">;</span>
+                            <span class="token punctuation">&#125;</span>
+                        <span class="token punctuation">&#125;</span>
+                    <span class="token punctuation">&#125;</span>
+                <span class="token punctuation">&#125;</span>
+            <span class="token punctuation">&#125;</span>
+            <span class="token keyword">else</span>
+            <span class="token punctuation">&#123;</span>
+                Status <span class="token operator">=</span> EDownloadStatus<span class="token punctuation">.</span>Success<span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">private</span> <span class="token return-type class-name">WebRequest</span> <span class="token function">CreateWebRequest</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token class-name">WebRequest</span> request<span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>Info<span class="token punctuation">.</span>DownloadUrl<span class="token punctuation">.</span><span class="token function">StartsWith</span><span class="token punctuation">(</span><span class="token string">"https"</span><span class="token punctuation">,</span> StringComparison<span class="token punctuation">.</span>OrdinalIgnoreCase<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            ServicePointManager<span class="token punctuation">.</span>ServerCertificateValidationCallback <span class="token operator">=</span> CheckValidationResult<span class="token punctuation">;</span>
+            request <span class="token operator">=</span> <span class="token function">GetHttpWebRequest</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        <span class="token keyword">else</span>
+        <span class="token punctuation">&#123;</span>
+            request <span class="token operator">=</span> <span class="token function">GetHttpWebRequest</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+
+        <span class="token keyword">return</span> request<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">private</span> <span class="token return-type class-name">WebRequest</span> <span class="token function">GetHttpWebRequest</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token class-name"><span class="token keyword">var</span></span> httpWebRequest <span class="token operator">=</span> <span class="token punctuation">(</span>HttpWebRequest<span class="token punctuation">)</span>WebRequest<span class="token punctuation">.</span><span class="token function">Create</span><span class="token punctuation">(</span>Info<span class="token punctuation">.</span>DownloadUrl<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        httpWebRequest<span class="token punctuation">.</span>ProtocolVersion <span class="token operator">=</span> HttpVersion<span class="token punctuation">.</span>Version11<span class="token punctuation">;</span>
+
+        <span class="token class-name"><span class="token keyword">var</span></span> <span class="token keyword">from</span> <span class="token operator">=</span> Info<span class="token punctuation">.</span>Offset <span class="token operator">+</span> Position<span class="token punctuation">;</span>
+        <span class="token class-name"><span class="token keyword">var</span></span> to <span class="token operator">=</span> Info<span class="token punctuation">.</span>Offset <span class="token operator">+</span> Info<span class="token punctuation">.</span>Size<span class="token punctuation">;</span>
+
+        httpWebRequest<span class="token punctuation">.</span><span class="token function">AddRange</span><span class="token punctuation">(</span><span class="token keyword">from</span><span class="token punctuation">,</span> to<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// TODO 加上超时</span>
+        <span class="token comment">//httpWebRequest.Timeout = 1000000; // 默认是1000s</span>
+
+        <span class="token keyword">return</span> httpWebRequest<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">private</span> <span class="token return-type class-name"><span class="token keyword">bool</span></span> <span class="token function">ReadToEnd</span><span class="token punctuation">(</span><span class="token class-name">Stream</span> reader<span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token class-name"><span class="token keyword">var</span></span> len <span class="token operator">=</span> reader<span class="token punctuation">.</span><span class="token function">Read</span><span class="token punctuation">(</span>m_ReadBuffer<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> m_ReadBuffer<span class="token punctuation">.</span>Length<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>len <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            m_Writer<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span>m_ReadBuffer<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> len<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            Position <span class="token operator">+=</span> len<span class="token punctuation">;</span>
+            <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+
+        <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>Status <span class="token operator">!=</span> EDownloadStatus<span class="token punctuation">.</span>Wait<span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+
+        Status <span class="token operator">=</span> EDownloadStatus<span class="token punctuation">.</span>Progressing<span class="token punctuation">;</span>
+        <span class="token class-name"><span class="token keyword">var</span></span> fileInfo <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token constructor-invocation class-name">FileInfo</span><span class="token punctuation">(</span>Info<span class="token punctuation">.</span>SavePath<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>fileInfo<span class="token punctuation">.</span>Exists <span class="token operator">&amp;&amp;</span> fileInfo<span class="token punctuation">.</span>Length <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>Info<span class="token punctuation">.</span>Size <span class="token operator">></span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> fileInfo<span class="token punctuation">.</span>Length <span class="token operator">==</span> Info<span class="token punctuation">.</span>Size<span class="token punctuation">)</span>
+            <span class="token punctuation">&#123;</span>
+                Status <span class="token operator">=</span> EDownloadStatus<span class="token punctuation">.</span>Success<span class="token punctuation">;</span>
+                Position <span class="token operator">=</span> Info<span class="token punctuation">.</span>Size<span class="token punctuation">;</span>
+                <span class="token keyword">return</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+
+            <span class="token comment">// TODO</span>
+            <span class="token comment">// issue：</span>
+            <span class="token comment">// IOException: Sharing violation on path</span>
+            <span class="token comment">// 文件读取了多次</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>m_Writer <span class="token operator">==</span> <span class="token keyword">null</span><span class="token punctuation">)</span>
+                m_Writer <span class="token operator">=</span> fileInfo<span class="token punctuation">.</span><span class="token function">OpenWrite</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            Position <span class="token operator">=</span> m_Writer<span class="token punctuation">.</span>Length <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span>
+
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>Info<span class="token punctuation">.</span><span class="token function">IsValid</span><span class="token punctuation">(</span>Position<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">&#123;</span>
+                Error <span class="token operator">=</span> <span class="token interpolation-string"><span class="token string">$"Invalid Range [</span><span class="token interpolation"><span class="token punctuation">&#123;</span><span class="token expression language-csharp">Info<span class="token punctuation">.</span>Offset <span class="token operator">+</span> Position </span><span class="token punctuation">&#125;</span></span><span class="token string">-</span><span class="token interpolation"><span class="token punctuation">&#123;</span><span class="token expression language-csharp"> Info<span class="token punctuation">.</span>Offset <span class="token operator">+</span> Position <span class="token operator">+</span> Info<span class="token punctuation">.</span>Size</span><span class="token punctuation">&#125;</span></span><span class="token string">]"</span></span><span class="token punctuation">;</span>
+                Status <span class="token operator">=</span> EDownloadStatus<span class="token punctuation">.</span>Failed<span class="token punctuation">;</span>
+                <span class="token keyword">return</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>Position <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> m_Writer<span class="token punctuation">.</span><span class="token function">Seek</span><span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> SeekOrigin<span class="token punctuation">.</span>End<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        <span class="token keyword">else</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>Info<span class="token punctuation">.</span><span class="token function">IsValid</span><span class="token punctuation">(</span>Position<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">&#123;</span>
+                Error <span class="token operator">=</span> <span class="token interpolation-string"><span class="token string">$"Invalid Range [</span><span class="token interpolation"><span class="token punctuation">&#123;</span><span class="token expression language-csharp">Info<span class="token punctuation">.</span>Offset <span class="token operator">+</span> Position </span><span class="token punctuation">&#125;</span></span><span class="token string">-</span><span class="token interpolation"><span class="token punctuation">&#123;</span><span class="token expression language-csharp"> Info<span class="token punctuation">.</span>Offset <span class="token operator">+</span> Position <span class="token operator">+</span> Info<span class="token punctuation">.</span>Size</span><span class="token punctuation">&#125;</span></span><span class="token string">]"</span></span><span class="token punctuation">;</span>
+                Status <span class="token operator">=</span> EDownloadStatus<span class="token punctuation">.</span>Failed<span class="token punctuation">;</span>
+                <span class="token keyword">return</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+
+
+            <span class="token class-name"><span class="token keyword">var</span></span> dir <span class="token operator">=</span> Path<span class="token punctuation">.</span><span class="token function">GetDirectoryName</span><span class="token punctuation">(</span>Info<span class="token punctuation">.</span>SavePath<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">string</span><span class="token punctuation">.</span><span class="token function">IsNullOrEmpty</span><span class="token punctuation">(</span>dir<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>Directory<span class="token punctuation">.</span><span class="token function">Exists</span><span class="token punctuation">(</span>dir<span class="token punctuation">)</span><span class="token punctuation">)</span> Directory<span class="token punctuation">.</span><span class="token function">CreateDirectory</span><span class="token punctuation">(</span>dir<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            m_Writer <span class="token operator">=</span> File<span class="token punctuation">.</span><span class="token function">Create</span><span class="token punctuation">(</span>Info<span class="token punctuation">.</span>SavePath<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            Position <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+
+        Task<span class="token punctuation">.</span><span class="token function">Run</span><span class="token punctuation">(</span>Run<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token preprocessor property">#<span class="token directive keyword">endregion</span></span>
+
+    <span class="token preprocessor property">#<span class="token directive keyword">region</span> IEnumerator Impl</span>
+
+    <span class="token return-type class-name"><span class="token keyword">bool</span></span> IEnumerator<span class="token punctuation">.</span><span class="token function">MoveNext</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token operator">!</span>IsDone<span class="token punctuation">;</span>
+
+    <span class="token return-type class-name"><span class="token keyword">void</span></span> IEnumerator<span class="token punctuation">.</span><span class="token function">Reset</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span> <span class="token punctuation">&#125;</span>
+
+    <span class="token return-type class-name"><span class="token keyword">object</span></span> IEnumerator<span class="token punctuation">.</span>Current <span class="token operator">=></span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+
+    <span class="token preprocessor property">#<span class="token directive keyword">endregion</span></span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <h3 id="UnityWebRequestDownload"><a href="#UnityWebRequestDownload" class="headerlink" title="UnityWebRequestDownload"></a>UnityWebRequestDownload</h3><ol>
 <li>大体上同HttpDownload，但没有线程操作，unity托管。</li>
@@ -279,325 +299,287 @@
 <li>DownloadHandlerScript传入buffer，可以减少内存分配。</li>
 </ol>
 <p>以下为完整实现</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br></pre></td><td class="code"><pre><code class="hljs csharp"><span class="hljs-keyword">public</span> <span class="hljs-keyword">sealed</span> <span class="hljs-keyword">class</span> <span class="hljs-title">UnityWebRequestDownload</span> : <span class="hljs-title">IDownloadAgent</span><br>&#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">sealed</span> <span class="hljs-keyword">class</span> <span class="hljs-title">MyDownloadScript</span> : <span class="hljs-title">DownloadHandlerScript</span><br>    &#123;<br>        <span class="hljs-keyword">private</span> UnityWebRequestDownload m_Download;<br><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">MyDownloadScript</span>(<span class="hljs-params">UnityWebRequestDownload download, <span class="hljs-built_in">byte</span>[] bytes</span>) : <span class="hljs-title">base</span>(<span class="hljs-params">bytes</span>)</span><br><span class="hljs-function"></span>        &#123;<br>            m_Download = download;<br>        &#125;<br><br>        <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">override</span> <span class="hljs-built_in">float</span> <span class="hljs-title">GetProgress</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>        &#123;<br>            <span class="hljs-keyword">return</span> m_Download.Progress;<br>        &#125;<br><br>        <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">override</span> <span class="hljs-built_in">bool</span> <span class="hljs-title">ReceiveData</span>(<span class="hljs-params"><span class="hljs-built_in">byte</span>[] buffer, <span class="hljs-built_in">int</span> dataLength</span>)</span><br><span class="hljs-function"></span>        &#123;<br>            <span class="hljs-keyword">return</span> m_Download.ReceiveData(buffer, dataLength);<br>        &#125;<br><br>        <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">override</span> <span class="hljs-keyword">void</span> <span class="hljs-title">CompleteContent</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>        &#123;<br>            m_Download.CompleteContent();<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">long</span> Position &#123; <span class="hljs-keyword">get</span>; <span class="hljs-keyword">private</span> <span class="hljs-keyword">set</span>; &#125;<br><br>    <span class="hljs-keyword">public</span> DownloadInfo Info &#123; <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; &#125;<br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">bool</span> IsDone =&gt; Status == EDownloadStatus.Failed || Status == EDownloadStatus.Success;<br>    <span class="hljs-keyword">public</span> EDownloadStatus Status &#123; <span class="hljs-keyword">get</span>; <span class="hljs-keyword">private</span> <span class="hljs-keyword">set</span>; &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">event</span> Action&lt;IDownloadAgent&gt; Completed;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">float</span> Progress =&gt; Position * <span class="hljs-number">1f</span> / Info.Size;<br><br><br>    <span class="hljs-keyword">private</span> UnityWebRequest m_Request;<br>    <span class="hljs-keyword">private</span> FileStream m_Writer;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">long</span> s_ReadBufferSize = <span class="hljs-number">1024</span> * <span class="hljs-number">4</span>;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> <span class="hljs-built_in">byte</span>[] m_ReadBuffer = <span class="hljs-keyword">new</span> <span class="hljs-built_in">byte</span>[s_ReadBufferSize];<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">string</span> Error &#123; <span class="hljs-keyword">get</span>; <span class="hljs-keyword">internal</span> <span class="hljs-keyword">set</span>; &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">override</span> <span class="hljs-built_in">string</span> <span class="hljs-title">ToString</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        <span class="hljs-keyword">return</span> Info.ToString();<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Start</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        <span class="hljs-keyword">if</span> (Status != EDownloadStatus.Wait) <span class="hljs-keyword">return</span>;<br><br>        Status = EDownloadStatus.Progressing;<br><br>        Error = <span class="hljs-literal">null</span>;<br><br>        <span class="hljs-keyword">var</span> fileInfo = <span class="hljs-keyword">new</span> FileInfo(Info.SavePath);<br><br>        <span class="hljs-keyword">if</span> (fileInfo.Exists &amp;&amp; fileInfo.Length &gt; <span class="hljs-number">0</span>)<br>        &#123;<br>            <span class="hljs-keyword">if</span> (Info.Size &gt; <span class="hljs-number">0</span> &amp;&amp; fileInfo.Length == Info.Size)<br>            &#123;<br>                Status = EDownloadStatus.Success;<br>                Position = Info.Size;<br>                <span class="hljs-keyword">return</span>;<br>            &#125;<br><br>            <span class="hljs-keyword">if</span> (m_Writer == <span class="hljs-literal">null</span>)<br>                m_Writer = fileInfo.OpenWrite();<br><br>            Position = m_Writer.Length - <span class="hljs-number">1</span>;<br><br>            <span class="hljs-keyword">if</span> (!Info.IsValid(Position))<br>            &#123;<br>                Error = <span class="hljs-string">$&quot;Invalid Range [<span class="hljs-subst">&#123;Info.Offset + Position &#125;</span>-<span class="hljs-subst">&#123; Info.Offset + Position + Info.Size&#125;</span>]&quot;</span>;<br>                Status = EDownloadStatus.Failed;<br>                <span class="hljs-keyword">return</span>;<br>            &#125;<br><br>            <span class="hljs-keyword">if</span> (Position &gt; <span class="hljs-number">0</span>) m_Writer.Seek(<span class="hljs-number">-1</span>, SeekOrigin.End);<br>        &#125;<br>        <span class="hljs-keyword">else</span><br>        &#123;<br>            <span class="hljs-keyword">if</span> (!Info.IsValid(Position))<br>            &#123;<br>                Error = <span class="hljs-string">$&quot;Invalid Range [<span class="hljs-subst">&#123;Info.Offset + Position &#125;</span>-<span class="hljs-subst">&#123; Info.Offset + Position + Info.Size&#125;</span>]&quot;</span>;<br>                Status = EDownloadStatus.Failed;<br>                <span class="hljs-keyword">return</span>;<br>            &#125;<br><br>            Position = <span class="hljs-number">0</span>;<br><br>            <span class="hljs-keyword">if</span> (!Info.IsValid(Position))<br>            &#123;<br>                Error = <span class="hljs-string">$&quot;Invalid Range [<span class="hljs-subst">&#123;Info.Offset + Position &#125;</span>-<span class="hljs-subst">&#123; Info.Offset + Position + Info.Size&#125;</span>]&quot;</span>;<br>                Status = EDownloadStatus.Failed;<br>                <span class="hljs-keyword">return</span>;<br>            &#125;<br><br>            <span class="hljs-keyword">var</span> dir = Path.GetDirectoryName(Info.SavePath);<br>            <span class="hljs-keyword">if</span> (!<span class="hljs-built_in">string</span>.IsNullOrEmpty(dir) &amp;&amp; !Directory.Exists(dir)) Directory.CreateDirectory(dir);<br><br>            m_Writer = File.Create(Info.SavePath);<br>        &#125;<br><br>        m_Request = CreateHttpWebRequest();<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Update</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        <span class="hljs-keyword">if</span> (Status == EDownloadStatus.Progressing)<br>        &#123;<br>            <span class="hljs-keyword">if</span> (m_Request.isDone &amp;&amp; m_Request.downloadedBytes &lt; (<span class="hljs-built_in">ulong</span>)Info.Size)<br>            &#123;<br>                Error = <span class="hljs-string">&quot;unknown error: downloadedBytes &lt; len&quot;</span>;<br>            &#125;<br>            <span class="hljs-keyword">if</span> (!<span class="hljs-built_in">string</span>.IsNullOrEmpty(m_Request.error))<br>            &#123;<br>                Error = m_Request.error;<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Pause</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        Status = EDownloadStatus.Wait;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Resume</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        Retry();<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Cancel</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        Error = <span class="hljs-string">&quot;User Cancel.&quot;</span>;<br>        Status = EDownloadStatus.Failed;<br>        CloseWrite();<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Complete</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        <span class="hljs-keyword">if</span> (Completed != <span class="hljs-literal">null</span>)<br>        &#123;<br>            Completed(<span class="hljs-keyword">this</span>);<br>            Completed = <span class="hljs-literal">null</span>;<br>        &#125;<br><br>        CloseWrite();<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> UnityWebRequest <span class="hljs-title">CreateHttpWebRequest</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        <span class="hljs-keyword">var</span> request = UnityWebRequest.Get(Info.DownloadUrl);<br>        request.downloadHandler = <span class="hljs-keyword">new</span> MyDownloadScript(<span class="hljs-keyword">this</span>, m_ReadBuffer);<br><br>        <span class="hljs-keyword">var</span> <span class="hljs-keyword">from</span> = Info.Offset + Position;<br>        <span class="hljs-keyword">var</span> to = Info.Offset + Info.Size;<br><br>        request.SetRequestHeader(<span class="hljs-string">&quot;Range&quot;</span>, <span class="hljs-string">&quot;bytes=&quot;</span> + (<span class="hljs-keyword">from</span>) + <span class="hljs-string">&quot;-&quot;</span> + (to));<br><br>        request.SendWebRequest();<br><br>        <span class="hljs-comment">// TODO 加上超时</span><br>        <span class="hljs-comment">//m_Request.Timeout = 1000000; // 默认是1000s</span><br><br>        <span class="hljs-keyword">return</span> request;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">CloseWrite</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        <span class="hljs-keyword">if</span> (m_Writer != <span class="hljs-literal">null</span>)<br>        &#123;<br>            m_Writer.Close();<br>            m_Writer.Dispose();<br>            m_Writer = <span class="hljs-literal">null</span>;<br>        &#125;<br>        <span class="hljs-keyword">if</span> (m_Request != <span class="hljs-literal">null</span>)<br>        &#123;<br>            m_Request.Abort();<br>            m_Request.Dispose();<br>            m_Request = <span class="hljs-literal">null</span>;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Retry</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        CloseWrite();<br>        Status = EDownloadStatus.Wait;<br>        Start();<br>    &#125;<br><br>    <span class="hljs-meta">#<span class="hljs-meta-keyword">region</span> Handler</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">internal</span> <span class="hljs-built_in">bool</span> <span class="hljs-title">ReceiveData</span>(<span class="hljs-params"><span class="hljs-built_in">byte</span>[] buffer, <span class="hljs-built_in">int</span> dataLength</span>)</span><br><span class="hljs-function"></span>    &#123;<br>        <span class="hljs-keyword">if</span> (!<span class="hljs-built_in">string</span>.IsNullOrEmpty(m_Request.error))<br>        &#123;<br>            Error = m_Request.error;<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>        &#125;<br><br>        m_Writer.Write(buffer, <span class="hljs-number">0</span>, dataLength);<br>        Position += dataLength;<br><br>        <span class="hljs-keyword">return</span> Status == EDownloadStatus.Progressing;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">internal</span> <span class="hljs-keyword">void</span> <span class="hljs-title">CompleteContent</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function"></span>    &#123;<br>        Status = EDownloadStatus.Success;<br><br>        CloseWrite();<br>    &#125;<br><br>    <span class="hljs-meta">#<span class="hljs-meta-keyword">endregion</span></span><br><br>    <span class="hljs-meta">#<span class="hljs-meta-keyword">region</span> IEnumerator Impl</span><br><br>    <span class="hljs-built_in">bool</span> IEnumerator.MoveNext() =&gt; !IsDone;<br><br>    <span class="hljs-keyword">void</span> IEnumerator.Reset()<br>    &#123; &#125;<br><br>    <span class="hljs-built_in">object</span> IEnumerator.Current =&gt; <span class="hljs-literal">null</span>;<br><br>    <span class="hljs-meta">#<span class="hljs-meta-keyword">endregion</span></span><br>&#125;<br></code></pre></td></tr></table></figure>
+<pre class="line-numbers language-csharp" data-language="csharp"><code class="language-csharp"><span class="token keyword">public</span> <span class="token keyword">sealed</span> <span class="token keyword">class</span> <span class="token class-name">UnityWebRequestDownload</span> <span class="token punctuation">:</span> <span class="token type-list"><span class="token class-name">IDownloadAgent</span></span>
+<span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">sealed</span> <span class="token keyword">class</span> <span class="token class-name">MyDownloadScript</span> <span class="token punctuation">:</span> <span class="token type-list"><span class="token class-name">DownloadHandlerScript</span></span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token keyword">private</span> <span class="token class-name">UnityWebRequestDownload</span> m_Download<span class="token punctuation">;</span>
+
+        <span class="token keyword">public</span> <span class="token function">MyDownloadScript</span><span class="token punctuation">(</span><span class="token class-name">UnityWebRequestDownload</span> download<span class="token punctuation">,</span> <span class="token class-name"><span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span></span> bytes<span class="token punctuation">)</span> <span class="token punctuation">:</span> <span class="token keyword">base</span><span class="token punctuation">(</span>bytes<span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            m_Download <span class="token operator">=</span> download<span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+
+        <span class="token keyword">protected</span> <span class="token keyword">override</span> <span class="token return-type class-name"><span class="token keyword">float</span></span> <span class="token function">GetProgress</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token keyword">return</span> m_Download<span class="token punctuation">.</span>Progress<span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+
+        <span class="token keyword">protected</span> <span class="token keyword">override</span> <span class="token return-type class-name"><span class="token keyword">bool</span></span> <span class="token function">ReceiveData</span><span class="token punctuation">(</span><span class="token class-name"><span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span></span> buffer<span class="token punctuation">,</span> <span class="token class-name"><span class="token keyword">int</span></span> dataLength<span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token keyword">return</span> m_Download<span class="token punctuation">.</span><span class="token function">ReceiveData</span><span class="token punctuation">(</span>buffer<span class="token punctuation">,</span> dataLength<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+
+        <span class="token keyword">protected</span> <span class="token keyword">override</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">CompleteContent</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            m_Download<span class="token punctuation">.</span><span class="token function">CompleteContent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">long</span></span> Position <span class="token punctuation">&#123;</span> <span class="token keyword">get</span><span class="token punctuation">;</span> <span class="token keyword">private</span> <span class="token keyword">set</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token return-type class-name">DownloadInfo</span> Info <span class="token punctuation">&#123;</span> <span class="token keyword">get</span><span class="token punctuation">;</span> <span class="token keyword">set</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">bool</span></span> IsDone <span class="token operator">=></span> Status <span class="token operator">==</span> EDownloadStatus<span class="token punctuation">.</span>Failed <span class="token operator">||</span> Status <span class="token operator">==</span> EDownloadStatus<span class="token punctuation">.</span>Success<span class="token punctuation">;</span>
+    <span class="token keyword">public</span> <span class="token return-type class-name">EDownloadStatus</span> Status <span class="token punctuation">&#123;</span> <span class="token keyword">get</span><span class="token punctuation">;</span> <span class="token keyword">private</span> <span class="token keyword">set</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">event</span> <span class="token class-name">Action<span class="token punctuation">&lt;</span>IDownloadAgent<span class="token punctuation">></span></span> Completed<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">float</span></span> Progress <span class="token operator">=></span> Position <span class="token operator">*</span> <span class="token number">1f</span> <span class="token operator">/</span> Info<span class="token punctuation">.</span>Size<span class="token punctuation">;</span>
+
+
+    <span class="token keyword">private</span> <span class="token class-name">UnityWebRequest</span> m_Request<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token class-name">FileStream</span> m_Writer<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token class-name"><span class="token keyword">long</span></span> s_ReadBufferSize <span class="token operator">=</span> <span class="token number">1024</span> <span class="token operator">*</span> <span class="token number">4</span><span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token keyword">readonly</span> <span class="token class-name"><span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span></span> m_ReadBuffer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token constructor-invocation class-name"><span class="token keyword">byte</span></span><span class="token punctuation">[</span>s_ReadBufferSize<span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">string</span></span> Error <span class="token punctuation">&#123;</span> <span class="token keyword">get</span><span class="token punctuation">;</span> <span class="token keyword">internal</span> <span class="token keyword">set</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">override</span> <span class="token return-type class-name"><span class="token keyword">string</span></span> <span class="token function">ToString</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span> Info<span class="token punctuation">.</span><span class="token function">ToString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>Status <span class="token operator">!=</span> EDownloadStatus<span class="token punctuation">.</span>Wait<span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+
+        Status <span class="token operator">=</span> EDownloadStatus<span class="token punctuation">.</span>Progressing<span class="token punctuation">;</span>
+
+        Error <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+
+        <span class="token class-name"><span class="token keyword">var</span></span> fileInfo <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token constructor-invocation class-name">FileInfo</span><span class="token punctuation">(</span>Info<span class="token punctuation">.</span>SavePath<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>fileInfo<span class="token punctuation">.</span>Exists <span class="token operator">&amp;&amp;</span> fileInfo<span class="token punctuation">.</span>Length <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>Info<span class="token punctuation">.</span>Size <span class="token operator">></span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> fileInfo<span class="token punctuation">.</span>Length <span class="token operator">==</span> Info<span class="token punctuation">.</span>Size<span class="token punctuation">)</span>
+            <span class="token punctuation">&#123;</span>
+                Status <span class="token operator">=</span> EDownloadStatus<span class="token punctuation">.</span>Success<span class="token punctuation">;</span>
+                Position <span class="token operator">=</span> Info<span class="token punctuation">.</span>Size<span class="token punctuation">;</span>
+                <span class="token keyword">return</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>m_Writer <span class="token operator">==</span> <span class="token keyword">null</span><span class="token punctuation">)</span>
+                m_Writer <span class="token operator">=</span> fileInfo<span class="token punctuation">.</span><span class="token function">OpenWrite</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            Position <span class="token operator">=</span> m_Writer<span class="token punctuation">.</span>Length <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span>
+
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>Info<span class="token punctuation">.</span><span class="token function">IsValid</span><span class="token punctuation">(</span>Position<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">&#123;</span>
+                Error <span class="token operator">=</span> <span class="token interpolation-string"><span class="token string">$"Invalid Range [</span><span class="token interpolation"><span class="token punctuation">&#123;</span><span class="token expression language-csharp">Info<span class="token punctuation">.</span>Offset <span class="token operator">+</span> Position </span><span class="token punctuation">&#125;</span></span><span class="token string">-</span><span class="token interpolation"><span class="token punctuation">&#123;</span><span class="token expression language-csharp"> Info<span class="token punctuation">.</span>Offset <span class="token operator">+</span> Position <span class="token operator">+</span> Info<span class="token punctuation">.</span>Size</span><span class="token punctuation">&#125;</span></span><span class="token string">]"</span></span><span class="token punctuation">;</span>
+                Status <span class="token operator">=</span> EDownloadStatus<span class="token punctuation">.</span>Failed<span class="token punctuation">;</span>
+                <span class="token keyword">return</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>Position <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> m_Writer<span class="token punctuation">.</span><span class="token function">Seek</span><span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> SeekOrigin<span class="token punctuation">.</span>End<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        <span class="token keyword">else</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>Info<span class="token punctuation">.</span><span class="token function">IsValid</span><span class="token punctuation">(</span>Position<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">&#123;</span>
+                Error <span class="token operator">=</span> <span class="token interpolation-string"><span class="token string">$"Invalid Range [</span><span class="token interpolation"><span class="token punctuation">&#123;</span><span class="token expression language-csharp">Info<span class="token punctuation">.</span>Offset <span class="token operator">+</span> Position </span><span class="token punctuation">&#125;</span></span><span class="token string">-</span><span class="token interpolation"><span class="token punctuation">&#123;</span><span class="token expression language-csharp"> Info<span class="token punctuation">.</span>Offset <span class="token operator">+</span> Position <span class="token operator">+</span> Info<span class="token punctuation">.</span>Size</span><span class="token punctuation">&#125;</span></span><span class="token string">]"</span></span><span class="token punctuation">;</span>
+                Status <span class="token operator">=</span> EDownloadStatus<span class="token punctuation">.</span>Failed<span class="token punctuation">;</span>
+                <span class="token keyword">return</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+
+            Position <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>Info<span class="token punctuation">.</span><span class="token function">IsValid</span><span class="token punctuation">(</span>Position<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">&#123;</span>
+                Error <span class="token operator">=</span> <span class="token interpolation-string"><span class="token string">$"Invalid Range [</span><span class="token interpolation"><span class="token punctuation">&#123;</span><span class="token expression language-csharp">Info<span class="token punctuation">.</span>Offset <span class="token operator">+</span> Position </span><span class="token punctuation">&#125;</span></span><span class="token string">-</span><span class="token interpolation"><span class="token punctuation">&#123;</span><span class="token expression language-csharp"> Info<span class="token punctuation">.</span>Offset <span class="token operator">+</span> Position <span class="token operator">+</span> Info<span class="token punctuation">.</span>Size</span><span class="token punctuation">&#125;</span></span><span class="token string">]"</span></span><span class="token punctuation">;</span>
+                Status <span class="token operator">=</span> EDownloadStatus<span class="token punctuation">.</span>Failed<span class="token punctuation">;</span>
+                <span class="token keyword">return</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+
+            <span class="token class-name"><span class="token keyword">var</span></span> dir <span class="token operator">=</span> Path<span class="token punctuation">.</span><span class="token function">GetDirectoryName</span><span class="token punctuation">(</span>Info<span class="token punctuation">.</span>SavePath<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">string</span><span class="token punctuation">.</span><span class="token function">IsNullOrEmpty</span><span class="token punctuation">(</span>dir<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>Directory<span class="token punctuation">.</span><span class="token function">Exists</span><span class="token punctuation">(</span>dir<span class="token punctuation">)</span><span class="token punctuation">)</span> Directory<span class="token punctuation">.</span><span class="token function">CreateDirectory</span><span class="token punctuation">(</span>dir<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            m_Writer <span class="token operator">=</span> File<span class="token punctuation">.</span><span class="token function">Create</span><span class="token punctuation">(</span>Info<span class="token punctuation">.</span>SavePath<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+
+        m_Request <span class="token operator">=</span> <span class="token function">CreateHttpWebRequest</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Update</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>Status <span class="token operator">==</span> EDownloadStatus<span class="token punctuation">.</span>Progressing<span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>m_Request<span class="token punctuation">.</span>isDone <span class="token operator">&amp;&amp;</span> m_Request<span class="token punctuation">.</span>downloadedBytes <span class="token operator">&lt;</span> <span class="token punctuation">(</span><span class="token keyword">ulong</span><span class="token punctuation">)</span>Info<span class="token punctuation">.</span>Size<span class="token punctuation">)</span>
+            <span class="token punctuation">&#123;</span>
+                Error <span class="token operator">=</span> <span class="token string">"unknown error: downloadedBytes &lt; len"</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">string</span><span class="token punctuation">.</span><span class="token function">IsNullOrEmpty</span><span class="token punctuation">(</span>m_Request<span class="token punctuation">.</span>error<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">&#123;</span>
+                Error <span class="token operator">=</span> m_Request<span class="token punctuation">.</span>error<span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Pause</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        Status <span class="token operator">=</span> EDownloadStatus<span class="token punctuation">.</span>Wait<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Resume</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token function">Retry</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Cancel</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        Error <span class="token operator">=</span> <span class="token string">"User Cancel."</span><span class="token punctuation">;</span>
+        Status <span class="token operator">=</span> EDownloadStatus<span class="token punctuation">.</span>Failed<span class="token punctuation">;</span>
+        <span class="token function">CloseWrite</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Complete</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>Completed <span class="token operator">!=</span> <span class="token keyword">null</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token function">Completed</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            Completed <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+
+        <span class="token function">CloseWrite</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">private</span> <span class="token return-type class-name">UnityWebRequest</span> <span class="token function">CreateHttpWebRequest</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token class-name"><span class="token keyword">var</span></span> request <span class="token operator">=</span> UnityWebRequest<span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span>Info<span class="token punctuation">.</span>DownloadUrl<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        request<span class="token punctuation">.</span>downloadHandler <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token constructor-invocation class-name">MyDownloadScript</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">,</span> m_ReadBuffer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token class-name"><span class="token keyword">var</span></span> <span class="token keyword">from</span> <span class="token operator">=</span> Info<span class="token punctuation">.</span>Offset <span class="token operator">+</span> Position<span class="token punctuation">;</span>
+        <span class="token class-name"><span class="token keyword">var</span></span> to <span class="token operator">=</span> Info<span class="token punctuation">.</span>Offset <span class="token operator">+</span> Info<span class="token punctuation">.</span>Size<span class="token punctuation">;</span>
+
+        request<span class="token punctuation">.</span><span class="token function">SetRequestHeader</span><span class="token punctuation">(</span><span class="token string">"Range"</span><span class="token punctuation">,</span> <span class="token string">"bytes="</span> <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token keyword">from</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"-"</span> <span class="token operator">+</span> <span class="token punctuation">(</span>to<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        request<span class="token punctuation">.</span><span class="token function">SendWebRequest</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// TODO 加上超时</span>
+        <span class="token comment">//m_Request.Timeout = 1000000; // 默认是1000s</span>
+
+        <span class="token keyword">return</span> request<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">private</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">CloseWrite</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>m_Writer <span class="token operator">!=</span> <span class="token keyword">null</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            m_Writer<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            m_Writer<span class="token punctuation">.</span><span class="token function">Dispose</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            m_Writer <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>m_Request <span class="token operator">!=</span> <span class="token keyword">null</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            m_Request<span class="token punctuation">.</span><span class="token function">Abort</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            m_Request<span class="token punctuation">.</span><span class="token function">Dispose</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            m_Request <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">private</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Retry</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token function">CloseWrite</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Status <span class="token operator">=</span> EDownloadStatus<span class="token punctuation">.</span>Wait<span class="token punctuation">;</span>
+        <span class="token function">Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token preprocessor property">#<span class="token directive keyword">region</span> Handler</span>
+
+    <span class="token keyword">internal</span> <span class="token return-type class-name"><span class="token keyword">bool</span></span> <span class="token function">ReceiveData</span><span class="token punctuation">(</span><span class="token class-name"><span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span></span> buffer<span class="token punctuation">,</span> <span class="token class-name"><span class="token keyword">int</span></span> dataLength<span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">string</span><span class="token punctuation">.</span><span class="token function">IsNullOrEmpty</span><span class="token punctuation">(</span>m_Request<span class="token punctuation">.</span>error<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            Error <span class="token operator">=</span> m_Request<span class="token punctuation">.</span>error<span class="token punctuation">;</span>
+            <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+
+        m_Writer<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span>buffer<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> dataLength<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Position <span class="token operator">+=</span> dataLength<span class="token punctuation">;</span>
+
+        <span class="token keyword">return</span> Status <span class="token operator">==</span> EDownloadStatus<span class="token punctuation">.</span>Progressing<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">internal</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">CompleteContent</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        Status <span class="token operator">=</span> EDownloadStatus<span class="token punctuation">.</span>Success<span class="token punctuation">;</span>
+
+        <span class="token function">CloseWrite</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token preprocessor property">#<span class="token directive keyword">endregion</span></span>
+
+    <span class="token preprocessor property">#<span class="token directive keyword">region</span> IEnumerator Impl</span>
+
+    <span class="token return-type class-name"><span class="token keyword">bool</span></span> IEnumerator<span class="token punctuation">.</span><span class="token function">MoveNext</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token operator">!</span>IsDone<span class="token punctuation">;</span>
+
+    <span class="token return-type class-name"><span class="token keyword">void</span></span> IEnumerator<span class="token punctuation">.</span><span class="token function">Reset</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span> <span class="token punctuation">&#125;</span>
+
+    <span class="token return-type class-name"><span class="token keyword">object</span></span> IEnumerator<span class="token punctuation">.</span>Current <span class="token operator">=></span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+
+    <span class="token preprocessor property">#<span class="token directive keyword">endregion</span></span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <h2 id="Github"><a href="#Github" class="headerlink" title="Github"></a>Github</h2><p>TODO</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://github.com/xasset/xasset">XAsset</a></p>
-
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                  <div class="post-meta mr-3">
-                    <i class="iconfont icon-category"></i>
-                    
-                      <a class="hover-with-bg" href="/categories/unity/">unity</a>
-                    
-                  </div>
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/unity/">unity</a>
-                    
-                      <a class="hover-with-bg" href="/tags/c/">c#</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">
-                  
-                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
-                  
-                </p>
-              
-              
-                <div class="post-prevnext">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2022/01/09/unity/%E6%B8%B8%E6%88%8F%E7%8E%A9%E6%B3%95/%E6%B8%B8%E6%88%8F%E6%80%A7%E6%A0%87%E7%AD%BE/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">游戏性标签(GameplayTag)</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2021/10/29/unity/%E5%9F%BA%E7%A1%80%E6%A1%86%E6%9E%B6/ugui%E7%BB%84%E4%BB%B6%E7%BB%91%E5%AE%9A%E5%92%8C%E4%BB%A3%E7%A0%81%E7%94%9F%E6%88%90/">
-                        <span class="hidden-mobile">ugui组件绑定和代码生成</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
-
-            
-              <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
-                
-                  
-                
-                
-  <div id="valine"></div>
-  <script type="text/javascript">
-    Fluid.utils.loadComments('#valine', function() {
-      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', function() {
-        var options = Object.assign(
-          {"appId":"4f4thF3LKGni6l4CAB08D3dE-gzGzoHsz","appKey":"p9RGSDvRFxjHsDJhvX5MgViA","path":"window.location.pathname","placeholder":"说点什么","avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":true,"recordIP":true,"serverURLs":"https://4f4thf3l.lc-cn-n1-shared.com","emojiCDN":null,"emojiMaps":null,"enableQQ":false,"appid":"4f4thF3LKGni6l4CAB08D3dE-gzGzoHsz","appkey":"p9RGSDvRFxjHsDJhvX5MgViA"},
-          {
-            el: "#valine",
-            path: window.location.pathname
-          }
-        )
-        new Valine(options);
-        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
-          Fluid.plugins.initFancyBox('#valine .vcontent img:not(.vemoji)');
-        })
-      });
-    });
-  </script>
-  <noscript>Please enable JavaScript to view the comments</noscript>
-
-
-              </article>
-            
-          </article>
-        </div>
-      </div>
-    </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div class="toc-body" id="toc-body"></div>
-</div>
-
-      </div>
-    
-  </div>
-</div>
-
-<!-- Custom -->
-
-
-    
-
-    
-      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
-        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-      </a>
-    
-
-    
-      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
-    </div>
-  </div>
-</div>
-    
-
-    
-  </main>
-
-  <footer class="text-center mt-5 py-3">
-  <div class="footer-content">
-     <div> <span id="copyright"></span></br> <span id="timeDate"></span> <script src="/js/duration.js"></script> </div> 
-  </div>
-  
-  <div class="statistics">
-    
-    
-
-    
-      
-        <!-- 不蒜子统计PV -->
-        <span id="busuanzi_container_site_pv" style="display: none">
-            共 
-            <span id="busuanzi_value_site_pv"></span>
-             次回眸
-          </span>
-      
-      
-        <!-- 不蒜子统计UV -->
-        <span id="busuanzi_container_site_uv" style="display: none">
-            与 
-            <span id="busuanzi_value_site_uv"></span>
-             人相遇
-          </span>
-      
-    
-  </div>
-
-
-  
-
-  
-</footer>
-
-
-  <!-- SCRIPTS -->
-  
-  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
-
-  <script>
-    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
-    NProgress.start()
-    window.addEventListener('load', function() {
-      NProgress.done();
-    })
-  </script>
-
-
-<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
-<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
-
-<!-- Plugins -->
-
-
-  <script  src="/js/local-search.js" ></script>
-
-
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
-
-
-
-  
-
-
-
-  
-    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
-  
-  
-    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
-  
-  
-    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
-  
-  
-    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
-  
-
-
-
-  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
-
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var title = document.getElementById('subtitle').title;
-      
-        typing(title);
-      
-    })(window, document);
-  </script>
-
-
-
-
-
-  
-
-  
-    <!-- MathJax -->
-    <script>
-      MathJax = {
-        tex: {
-          inlineMath: [['$', '$'], ['\\(', '\\)']]
-        },
-        loader: {
-          
-        },
-        options: {
-          renderActions: {
-            findScript: [10, doc => {
-              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
-                const display = !!node.type.match(/; *mode=display/);
-                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
-                const text = document.createTextNode('');
-                node.parentNode.replaceChild(text, node);
-                math.start = { node: text, delim: '', n: 0 };
-                math.end = { node: text, delim: '', n: 0 };
-                doc.math.push(math);
-              });
-            }, '', false],
-            insertedScript: [200, () => {
-              document.querySelectorAll('mjx-container').forEach(node => {
-                let target = node.parentNode;
-                if (target.nodeName.toLowerCase() === 'li') {
-                  target.parentNode.classList.add('has-jax');
-                }
-              });
-            }, '', false]
-          }
-        }
-      };
-    </script>
-
-    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.1.2/es5/tex-svg.js" ></script>
-
-  
-
-
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8.8.3/dist/mermaid.min.js" ></script>
-  <script>
-    if (window.mermaid) {
-      mermaid.initialize({"theme":"default"});
+</div><ul class="post-copyright"><li class="post-copyright-author"><strong>本文作者：</strong>Sarofc</li><li class="post-copyright-link"><strong>本文链接：</strong><a href="https://sarofc.gitee.io/2022/01/09/unity/%E5%9F%BA%E7%A1%80%E6%A1%86%E6%9E%B6/%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD%E5%99%A8/" title="文件下载器">https://sarofc.gitee.io/2022/01/09/unity/%E5%9F%BA%E7%A1%80%E6%A1%86%E6%9E%B6/%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD%E5%99%A8/</a></li><li class="post-copyright-license"><strong>版权声明：</strong>本博客所有文章除特别声明外，均默认采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener" title="CC BY-NC-SA 4.0 "><svg class="icon"><use xlink:href="#icon-creative-commons-line"></use></svg><svg class="icon"><use xlink:href="#icon-creative-commons-by-line"></use></svg><svg class="icon"><use xlink:href="#icon-creative-commons-nc-line"></use></svg><svg class="icon"><use xlink:href="#icon-creative-commons-sa-line"></use></svg></a> 许可协议。</li></ul></section></article><div class="post-nav"><div class="post-nav-item"><a class="post-nav-prev" href="/2022/01/09/unity/%E6%B8%B8%E6%88%8F%E7%8E%A9%E6%B3%95/%E6%B8%B8%E6%88%8F%E6%80%A7%E6%A0%87%E7%AD%BE/" rel="prev" title="游戏性标签(GameplayTag)"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-arrow-left-s-line"></use></svg><span class="post-nav-text">游戏性标签(GameplayTag)</span></a></div><div class="post-nav-item"><a class="post-nav-next" href="/2021/10/29/unity/%E5%9F%BA%E7%A1%80%E6%A1%86%E6%9E%B6/ugui%E7%BB%84%E4%BB%B6%E7%BB%91%E5%AE%9A%E5%92%8C%E4%BB%A3%E7%A0%81%E7%94%9F%E6%88%90/" rel="next" title="ugui组件绑定和代码生成"><span class="post-nav-text">ugui组件绑定和代码生成</span><svg class="icon" aria-hidden="true"><use xlink:href="#icon-arrow-right-s-line"></use></svg></a></div></div></div><div class="hty-card" id="comment"><div class="comment-tooltip text-center"><span>要不要和我说些什么？</span><br></div><div class="toggle-comment-system" style="margin: 1rem auto"><a class="toggle-comment-btn hty-button hty-button--raised text-uppercase" data-target="#valine-container" onclick="showComment(this.dataset.target)">valine</a><style>.utterances {
+  display: none;
+}</style><a class="toggle-comment-btn hty-button hty-button--raised text-uppercase" data-target=".utterances" onclick="showComment(this.dataset.target)">utterances</a><script>function hideAllComment() {
+  //- hide all
+  document.querySelectorAll('.toggle-comment-btn').forEach((btn) => {
+    const container = document.querySelector(btn.dataset.target);
+    if (container) {
+      container.style.display = "none";
     }
-  </script>
+  });
+}
+function showComment(target) {
+  hideAllComment();
+  //- show target
+  const targetContainer = document.querySelector(target);
+  if (targetContainer) {
+    targetContainer.style.display = "block";
+  }
+}
+</script></div><div id="valine-container"></div><script>Yun.utils.getScript("https://cdn.jsdelivr.net/npm/valine@latest/dist/Valine.min.js", () => {
+  const valineConfig = {"enable":true,"appId":"4f4thF3LKGni6l4CAB08D3dE-gzGzoHsz","appKey":"p9RGSDvRFxjHsDJhvX5MgViA","placeholder":"说点什么","avatar":"mp","meta":["nick","mail","link"],"pageSize":10,"lang":"zh-cn","visitor":false,"highlight":true,"recordIP":true,"serverURLs":"https://4f4thf3l.lc-cn-n1-shared.com","enableQQ":true,"requiredFields":["nick","mail"],"el":"#valine-container"}
+  valineConfig.path = "/2022/01/09/unity/%E5%9F%BA%E7%A1%80%E6%A1%86%E6%9E%B6/%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD%E5%99%A8/"
+  new Valine(valineConfig)
+}, window.Valine);</script><style>.utterances {
+  max-width: 100%;
+}</style><script src="https://utteranc.es/client.js" repo="Sarofc/hexo-comment" issue-term="pathname" theme="github-light" crossorigin="anonymous" async></script></div></main><footer class="sidebar-translate" id="footer"><div class="copyright"><span>&copy; 2019 – 2022 </span><span class="with-love" id="animate"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-cloud-line"></use></svg></span><span class="author"> Sarofc</span></div><div class="powered"><span>由 <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 驱动 v6.0.0</span><span class="footer-separator">|</span><span>主题 - <a rel="noopener" href="https://github.com/YunYouJun/hexo-theme-yun" target="_blank"><span>Yun</span></a> v1.7.0</span></div><div id="busuanzi"><span id="busuanzi_container_site_uv" title="总访客量"><span><svg class="icon" aria-hidden="true"><use xlink:href="#icon-user-line"></use></svg></span><span id="busuanzi_value_site_uv"></span></span><span class="footer-separator">|</span><span id="busuanzi_container_site_pv" title="总访问量"><span><svg class="icon" aria-hidden="true"><use xlink:href="#icon-eye-line"></use></svg></span><span id="busuanzi_value_site_pv"></span></span><script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></footer><a class="hty-icon-button" id="back-to-top" aria-label="back-to-top" href="#"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-arrow-up-s-line"></use></svg><svg class="progress-circle-container" viewBox="0 0 100 100"><circle class="progress-circle" id="progressCircle" cx="50" cy="50" r="48" fill="none" stroke="#0078E7" stroke-width="2" stroke-linecap="round"></circle></svg></a><a class="popup-trigger hty-icon-button icon-search" id="search" href="javascript:;" title="搜索"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-search-line"></use></svg></span></a><script>window.addEventListener("DOMContentLoaded", () => {
+  // Handle and trigger popup window
+  document.querySelector(".popup-trigger").addEventListener("click", () => {
+    document.querySelector(".popup").classList.add("show");
+    setTimeout(() => {
+      document.querySelector(".search-input").focus();
+    }, 100);
+  });
 
+  // Monitor main search box
+  const onPopupClose = () => {
+    document.querySelector(".popup").classList.remove("show");
+  };
 
+  document.querySelector(".popup-btn-close").addEventListener("click", () => {
+    onPopupClose();
+  });
 
-
-
-
-  
-<script src="/js/xiaoxingxing.js"></script>
-<script src="/js/xiantiao.js"></script>
-
-
-
-<!-- 主题的启动项 保持在最底部 -->
-<script  src="/js/boot.js" ></script>
-
-
-</body>
-</html>
+  window.addEventListener("keyup", event => {
+    if (event.key === "Escape") {
+      onPopupClose();
+    }
+  });
+});
+</script><script src="/js/search/local-search.js" defer></script><div class="popup search-popup"><div class="search-header"><span class="popup-btn-close close-icon hty-icon-button"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-close-line"></use></svg></span></div><div class="search-input-container"><input class="search-input" id="local-search-input" type="text" placeholder="搜索..." value=""></div><div id="local-search-result"></div></div><div class="aplayer no-destroy" id="aplayer" data-id="98381187" data-server="netease" data-type="playlist" data-fixed="true" data-theme="#0078E7" data-loop="all" data-order="list" data-preload="auto" data-volume="0.1" data-mutex data-lrctype="0" data-listmaxheight="340px" data-storagename="metingjs"></div></div></body></html>
