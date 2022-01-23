@@ -41,9 +41,9 @@ document.addEventListener("pjax:success", initScrollReveal);
   100%{
     text-shadow: 0 5px 10px rgba(0,0,0,0), 
   }
-}</style><article><section class="post-body" itemprop="articleBody"><div class="post-content markdown-body"></div></section></article></div><div class="hty-card" id="comment"><div class="comment-tooltip text-center"><span>要不要和我说些什么？</span><br></div><div class="toggle-comment-system" style="margin: 1rem auto"><a class="toggle-comment-btn hty-button hty-button--raised text-uppercase" data-target="#valine-container" onclick="showComment(this.dataset.target)">valine</a><style>.utterances {
+}</style><article><section class="post-body" itemprop="articleBody"><div class="post-content markdown-body"></div></section></article></div><div class="hty-card" id="comment"><div class="comment-tooltip text-center"><span>要不要和我说些什么？</span><br></div><div class="toggle-comment-system" style="margin: 1rem auto"><a class="toggle-comment-btn hty-button hty-button--raised text-uppercase" data-target=".utterances" onclick="showComment(this.dataset.target)">utterances</a><style>#valine-container {
   display: none;
-}</style><a class="toggle-comment-btn hty-button hty-button--raised text-uppercase" data-target=".utterances" onclick="showComment(this.dataset.target)">utterances</a><script>function hideAllComment() {
+}</style><a class="toggle-comment-btn hty-button hty-button--raised text-uppercase" data-target="#valine-container" onclick="showComment(this.dataset.target)">valine</a><script>function hideAllComment() {
   //- hide all
   document.querySelectorAll('.toggle-comment-btn').forEach((btn) => {
     const container = document.querySelector(btn.dataset.target);
@@ -61,7 +61,7 @@ function showComment(target) {
   }
 }
 </script></div><div id="valine-container"></div><script>Yun.utils.getScript("https://cdn.jsdelivr.net/npm/valine@latest/dist/Valine.min.js", () => {
-  const valineConfig = {"enable":true,"appId":"4f4thF3LKGni6l4CAB08D3dE-gzGzoHsz","appKey":"p9RGSDvRFxjHsDJhvX5MgViA","placeholder":"说点什么","avatar":"mp","meta":["nick","mail","link"],"pageSize":10,"lang":"zh-cn","visitor":false,"highlight":true,"recordIP":true,"serverURLs":"https://4f4thf3l.lc-cn-n1-shared.com","enableQQ":true,"requiredFields":["nick","mail"],"el":"#valine-container"}
+  const valineConfig = {"enable":true,"appId":"4f4thF3LKGni6l4CAB08D3dE-gzGzoHsz","appKey":"p9RGSDvRFxjHsDJhvX5MgViA","placeholder":"说点什么","avatar":"mp","meta":["nick","mail","link"],"pageSize":10,"lang":"zh-cn","visitor":false,"highlight":true,"recordIP":true,"serverURLs":"https://4f4thf3l.lc-cn-n1-shared.com","enableQQ":true,"requiredFields":["nick"],"el":"#valine-container"}
   valineConfig.path = "/404.html"
   new Valine(valineConfig)
 }, window.Valine);</script><style>.utterances {
