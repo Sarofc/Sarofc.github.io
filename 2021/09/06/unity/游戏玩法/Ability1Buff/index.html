@@ -1,0 +1,377 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#0078E7"><meta name="author" content="星星"><meta name="copyright" content="星星"><meta name="generator" content="Hexo 6.2.0"><meta name="theme" content="hexo-theme-yun"><title>技能系统(一) Buff | 星星's Blog</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@900&amp;display=swap" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/star-markdown-css@0.3.3/dist/yun/yun-markdown.min.css"><link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/prism-theme-vars/base.css"><script src="//at.alicdn.com/t/font_1140697_dxory92pb0h.js" async></script><script src="https://fastly.jsdelivr.net/npm/@unocss/runtime/mini.global.js"></script><script src="https://fastly.jsdelivr.net/npm/scrollreveal/dist/scrollreveal.min.js" defer></script><script>function initScrollReveal() {
+  [".post-card",".markdown-body img"].forEach((target)=> {
+    ScrollReveal().reveal(target);
+  })
+}
+document.addEventListener("DOMContentLoaded", initScrollReveal);
+document.addEventListener("pjax:success", initScrollReveal);
+</script><link class="aplayer-style-marker" rel="stylesheet" type="text/css" href="https://fastly.jsdelivr.net/npm/aplayer@latest/dist/APlayer.min.css"><script class="aplayer-script-marker" src="https://fastly.jsdelivr.net/npm/aplayer@latest/dist/APlayer.min.js" defer></script><script class="meting-script-marker" src="https://fastly.jsdelivr.net/npm/meting@1/dist/Meting.min.js" defer></script><script src="https://fastly.jsdelivr.net/npm/pjax@latest/pjax.min.js" defer></script><script src="/js/pjax.js" defer type="module"></script><script src="https://fastly.jsdelivr.net/npm/vue@2.6.14"></script><link rel="icon" type="image/png" href="/img/myfavicon.ico"><link rel="mask-icon" href="/img/myfavicon.ico" color="#0078E7"><link rel="preload" href="/css/hexo-theme-yun.css" as="style"><link rel="preload" href="/js/utils.js" as="script"><link rel="preload" href="/js/hexo-theme-yun.js" as="script"><link rel="prefetch" href="/js/sidebar.js" as="script"><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://fastly.jsdelivr.net/npm/" crossorigin><script id="yun-config">
+    window.Yun = {}
+    window.CONFIG = {"hostname":"sarofc.gitee.io","root":"/","title":"温暖的晨光，散去了忧伤","version":"1.9.3","mode":"auto","copycode":true,"page":{"isPost":true},"i18n":{"placeholder":"搜索...","empty":"找不到您查询的内容: ${query}","hits":"找到 ${hits} 条结果","hits_time":"找到 ${hits} 条结果（用时 ${time} 毫秒）"},"anonymous_image":"https://cdn.yunyoujun.cn/img/avatar/none.jpg","fireworks":{"colors":null},"vendors":{"darken":"https://fastly.jsdelivr.net/npm/darken@1.5.0"}};
+  </script><link rel="stylesheet" href="/css/hexo-theme-yun.css"><script src="/js/hexo-theme-yun.js" type="module"></script><meta name="description" content="buff模块。技能系统的中介者。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="技能系统(一) Buff">
+<meta property="og:url" content="https://sarofc.gitee.io/2021/09/06/unity/%E6%B8%B8%E6%88%8F%E7%8E%A9%E6%B3%95/Ability1Buff/index.html">
+<meta property="og:site_name" content="星星&#39;s Blog">
+<meta property="og:description" content="buff模块。技能系统的中介者。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://sarofc.gitee.io/2021/09/06/unity/%E6%B8%B8%E6%88%8F%E7%8E%A9%E6%B3%95/Ability1Buff/pic0.jpg">
+<meta property="og:image" content="https://sarofc.gitee.io/2021/09/06/unity/%E6%B8%B8%E6%88%8F%E7%8E%A9%E6%B3%95/Ability1Buff/pic1.jpg">
+<meta property="article:published_time" content="2021-09-06T04:22:43.000Z">
+<meta property="article:modified_time" content="2021-09-06T04:22:43.000Z">
+<meta property="article:author" content="星星">
+<meta property="article:tag" content="gameplay">
+<meta property="article:tag" content="ability">
+<meta property="article:tag" content="buff">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sarofc.gitee.io/2021/09/06/unity/%E6%B8%B8%E6%88%8F%E7%8E%A9%E6%B3%95/Ability1Buff/pic0.jpg"><script>(function() {
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+  const setting = localStorage.getItem('darken-mode') || 'auto'
+  if (setting === 'dark' || (prefersDark && setting !== 'light'))
+    document.documentElement.classList.toggle('dark', true)
+})()</script></head><body><script defer src="https://fastly.jsdelivr.net/npm/animejs@latest"></script><script defer src="/js/ui/fireworks.js" type="module"></script><canvas class="fireworks"></canvas><div class="container"><a class="sidebar-toggle hty-icon-button" id="menu-btn"><div class="hamburger hamburger--spin" type="button"><span class="hamburger-box"><span class="hamburger-inner"></span></span></div></a><div class="sidebar-toggle sidebar-overlay"></div><aside class="sidebar"><script src="/js/sidebar.js" type="module"></script><ul class="sidebar-nav"><li class="sidebar-nav-item sidebar-nav-toc hty-icon-button sidebar-nav-active" data-target="post-toc-wrap" title="文章目录"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-list-ordered"></use></svg></li><li class="sidebar-nav-item sidebar-nav-overview hty-icon-button" data-target="site-overview-wrap" title="站点概览"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-passport-line"></use></svg></li></ul><div class="sidebar-panel" id="site-overview-wrap"><div class="site-info fix-top"><a class="site-author-avatar" href="/about/" title="星星"><img width="96" loading="lazy" src="/img/myfavicon.ico" alt="星星"><span class="site-author-status" title="A Gamer">😊</span></a><div class="site-author-name"><a href="/about/">星星</a></div><span class="site-name">星星's Blog</span><sub class="site-subtitle"></sub><div class="site-description">A Gamer</div></div><nav class="site-state"><a class="site-state-item hty-icon-button icon-home" href="/" title="首页"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-home-4-line"></use></svg></span></a><div class="site-state-item"><a href="/archives/" title="归档"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-archive-line"></use></svg></span><span class="site-state-item-count">26</span></a></div><div class="site-state-item"><a href="/categories/" title="分类"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-folder-2-line"></use></svg></span><span class="site-state-item-count">5</span></a></div><div class="site-state-item"><a href="/tags/" title="标签"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-price-tag-3-line"></use></svg></span><span class="site-state-item-count">20</span></a></div><a class="site-state-item hty-icon-button" href="/about/#comment" title="留言板"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-clipboard-line"></use></svg></span></a></nav><hr style="margin-bottom:0.5rem"><div class="links-of-author"><a class="links-of-author-item hty-icon-button" rel="noopener" href="https://github.com/Sarofc" title="GitHub" target="_blank" style="color:#6e5494"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-github-line"></use></svg></a><a class="links-of-author-item hty-icon-button" rel="noopener" href="https://space.bilibili.com/29047160" title="哔哩哔哩" target="_blank" style="color:#FF8EB3"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-bilibili-line"></use></svg></a></div><br><a class="links-item hty-icon-button" id="toggle-mode-btn" href="javascript:;" title="Mode" style="color: #f1cb64"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-contrast-2-line"></use></svg></a></div><div class="sidebar-panel sidebar-panel-active" id="post-toc-wrap"><div class="post-toc"><div class="post-toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.</span> <span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Event"><span class="toc-number">1.1.</span> <span class="toc-text">1.Event</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Action"><span class="toc-number">1.2.</span> <span class="toc-text">2.Action</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Target"><span class="toc-number">1.3.</span> <span class="toc-text">3.Target</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Buff%E8%87%AA%E8%BA%AB%E9%80%BB%E8%BE%91"><span class="toc-number">2.</span> <span class="toc-text">Buff自身逻辑</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%B1%9E%E6%80%A7%E6%94%B9%E5%8F%98"><span class="toc-number">2.1.</span> <span class="toc-text">1.属性改变</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E7%8A%B6%E6%80%81%E6%94%B9%E5%8F%98"><span class="toc-number">2.2.</span> <span class="toc-text">2.状态改变</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%A0%86%E5%8F%A0%E5%92%8C%E6%BA%A2%E5%87%BA"><span class="toc-number">2.3.</span> <span class="toc-text">3.堆叠和溢出</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-buff%E7%9A%84%E6%96%BD%E5%8A%A0%E5%92%8C%E9%A9%B1%E6%95%A3"><span class="toc-number">2.4.</span> <span class="toc-text">4.buff的施加和驱散</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-buff%E6%97%B6%E9%97%B4%E7%AD%96%E7%95%A5"><span class="toc-number">2.5.</span> <span class="toc-text">5.buff时间策略</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8C%81%E7%BB%AD%E6%97%B6%E9%97%B4-duration"><span class="toc-number">2.5.1.</span> <span class="toc-text">持续时间(duration)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#buff%E7%94%9F%E6%95%88%E5%91%A8%E6%9C%9F-period"><span class="toc-number">2.5.2.</span> <span class="toc-text">buff生效周期(period)</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE"><span class="toc-number">3.</span> <span class="toc-text">配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%A9%E5%B1%95%E6%80%A7"><span class="toc-number">4.</span> <span class="toc-text">扩展性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E6%95%B0%E6%8D%AE%E9%A9%B1%E5%8A%A8%E8%AF%9D%E9%85%8D%E7%BD%AE"><span class="toc-number">4.1.</span> <span class="toc-text">1.数据驱动话配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E8%84%9A%E6%9C%AC%E5%8C%96buff-IScriptRunner"><span class="toc-number">4.2.</span> <span class="toc-text">2.脚本化buff(IScriptRunner)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%9D%E8%80%83"><span class="toc-number">5.</span> <span class="toc-text">思考</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-number">6.</span> <span class="toc-text">参考</span></a></li></ol></div></div></div><div class="tag-cloud"><div class="tag-cloud-tags"><a href="/tags/ability/" style="font-size: 12px; color: #999">ability</a> <a href="/tags/asset/" style="font-size: 21px; color: #4d89c0">asset</a> <a href="/tags/buff/" style="font-size: 12px; color: #999">buff</a> <a href="/tags/c/" style="font-size: 21px; color: #4d89c0">c#</a> <a href="/tags/codegen/" style="font-size: 12px; color: #999">codegen</a> <a href="/tags/ecs/" style="font-size: 12px; color: #999">ecs</a> <a href="/tags/excel/" style="font-size: 12px; color: #999">excel</a> <a href="/tags/gamedev/" style="font-size: 25.5px; color: #2680d4">gamedev</a> <a href="/tags/gameplay/" style="font-size: 16.5px; color: #7391ad">gameplay</a> <a href="/tags/gameplay-attribute/" style="font-size: 12px; color: #999">gameplay attribute</a> <a href="/tags/gameplaytag/" style="font-size: 12px; color: #999">gameplaytag</a> <a href="/tags/hexo/" style="font-size: 12px; color: #999">hexo</a> <a href="/tags/markdown/" style="font-size: 12px; color: #999">markdown</a> <a href="/tags/object-pool/" style="font-size: 12px; color: #999">object pool</a> <a href="/tags/souls-like/" style="font-size: 12px; color: #999">souls like</a> <a href="/tags/ugui/" style="font-size: 12px; color: #999">ugui</a> <a href="/tags/unity/" style="font-size: 30px; color: #0078e7">unity</a> <a href="/tags/vfs/" style="font-size: 12px; color: #999">vfs</a> <a href="/tags/visual-studio/" style="font-size: 12px; color: #999">visual studio</a> <a href="/tags/%E8%99%9A%E6%8B%9F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" style="font-size: 12px; color: #999">虚拟文件系统</a></div></div></aside><main class="sidebar-translate" id="content"><div id="post"><article class="hty-card post-block" itemscope itemtype="https://schema.org/Article" style="--smc-primary:#0078E7;"><link itemprop="mainEntityOfPage" href="https://sarofc.gitee.io/2021/09/06/unity/%E6%B8%B8%E6%88%8F%E7%8E%A9%E6%B3%95/Ability1Buff/"><span hidden itemprop="author" itemscope itemtype="https://schema.org/Person"><meta itemprop="name" content="星星"><meta itemprop="description"></span><span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization"><meta itemprop="name" content="星星's Blog"></span><header class="post-header"><h1 class="post-title" itemprop="name headline">技能系统(一) Buff</h1><div class="post-meta"><div class="post-time" style="display:block"><span class="post-meta-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-calendar-line"></use></svg></span> <time title="创建时间：2021-09-06 12:22:43" itemprop="dateCreated datePublished" datetime="2021-09-06T12:22:43+08:00">2021-09-06</time></div><span class="post-count"><span class="post-symbolcount"><span class="post-meta-item-icon" title="本文字数"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-file-word-line"></use></svg></span> <span title="本文字数">1.9k</span><span class="post-meta-divider">-</span><span class="post-meta-item-icon" title="阅读时长"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-timer-line"></use></svg></span> <span title="阅读时长">8m</span></span></span><span class="post-busuanzi"><span class="post-meta-divider">-</span><span class="post-meta-item-icon" title="阅读次数"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-eye-line"></use></svg> <span id="busuanzi_value_page_pv"></span></span></span><div class="post-classify"><span class="post-category"> <span class="post-meta-item-icon" style="margin-right:3px;"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-folder-line"></use></svg></span><span itemprop="about" itemscope itemtype="https://schema.org/Thing"><a class="category-item" href="/categories/unity/" style="--text-color:var(--hty-text-color)" itemprop="url" rel="index"><span itemprop="text">unity</span></a></span></span><span class="post-tag"><span class="post-meta-divider">-</span><a class="tag-item" href="/tags/gameplay/" style="--text-color:var(--hty-text-color)"><span class="post-meta-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-price-tag-3-line"></use></svg></span><span class="tag-name">gameplay</span></a><a class="tag-item" href="/tags/ability/" style="--text-color:var(--hty-text-color)"><span class="post-meta-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-price-tag-3-line"></use></svg></span><span class="tag-name">ability</span></a><a class="tag-item" href="/tags/buff/" style="--text-color:var(--hty-text-color)"><span class="post-meta-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-price-tag-3-line"></use></svg></span><span class="tag-name">buff</span></a></span></div></div></header><section class="post-body" itemprop="articleBody"><div class="post-content markdown-body"><p>buff处理自身的生命周期、叠加，数值，状态外，还可以响应任何模块的事件。</p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>buff系统主要由Event、Action、Target三部分组成。</p>
+<h3 id="1-Event"><a href="#1-Event" class="headerlink" title="1.Event"></a>1.Event</h3><p>事件，buff的灵魂，参考了Dota2的技能系统。buff里本身没有其他游戏逻辑，只定义事件，绑定Action。buff自身也有一些OnCreated、OnDestroyed事件等，这些buff相关的事件自己管理，其他事件，例如OnDamage事件，则buff监听战斗模块的事件，战斗模块抛出事件，buff便可响应，调用绑定好的Action。所以，buff是一个中介者的角色，真正的游戏效果实现，还是在各个模块里实现的。</p>
+<p>事件参数，通过EventArgs包装，可以方便接入c# EventHandler设计。</p>
+<!-- TODO 补上buff执行逻辑图 -->
+
+<details><summary>自定义绑定 参考</summary>
+
+<pre class="language-csharp" data-language="csharp"><code class="language-csharp"><span class="token keyword">partial</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Register</span><span class="token punctuation">(</span><span class="token class-name">ICombatUnit</span> unit<span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>Target <span class="token operator">==</span> <span class="token keyword">null</span><span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+
+    Target<span class="token punctuation">.</span>OnAfterDealDamage <span class="token operator">+=</span> Unit_OnAfterDealDamage<span class="token punctuation">;</span>
+    Target<span class="token punctuation">.</span>OnBeforeReceiveDamage <span class="token operator">+=</span> Unit_BeforeReceiveDamage<span class="token punctuation">;</span>
+    Target<span class="token punctuation">.</span>OnAfterReceiveDamage <span class="token operator">+=</span> Unit_OnAfterReceiveDamage<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">partial</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Unregister</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>Target <span class="token operator">==</span> <span class="token keyword">null</span><span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+
+    Target<span class="token punctuation">.</span>OnAfterDealDamage <span class="token operator">-=</span> Unit_OnAfterDealDamage<span class="token punctuation">;</span>
+    Target<span class="token punctuation">.</span>OnBeforeReceiveDamage <span class="token operator">-=</span> Unit_BeforeReceiveDamage<span class="token punctuation">;</span>
+    Target<span class="token punctuation">.</span>OnAfterReceiveDamage <span class="token operator">-=</span> Unit_OnAfterReceiveDamage<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">private</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Unit_BeforeReceiveDamage</span><span class="token punctuation">(</span><span class="token class-name">DamageInfo</span> damageInfo<span class="token punctuation">,</span> <span class="token class-name">IHealthOwner</span> target<span class="token punctuation">,</span> <span class="token class-name">IDamageDealer</span> attacker<span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    <span class="token class-name"><span class="token keyword">var</span></span> args <span class="token operator">=</span> EventArgs_Damage<span class="token punctuation">.</span><span class="token function">Create</span><span class="token punctuation">(</span>attacker<span class="token punctuation">,</span> target<span class="token punctuation">,</span> damageInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">HandleEvent</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span>EEvent_Buff<span class="token punctuation">.</span>OnBeforeReceiveDamage<span class="token punctuation">,</span> args<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    EventArgs_Damage<span class="token punctuation">.</span><span class="token function">Release</span><span class="token punctuation">(</span>args<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">private</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Unit_OnAfterReceiveDamage</span><span class="token punctuation">(</span><span class="token class-name">DamageInfo</span> damageInfo<span class="token punctuation">,</span> <span class="token class-name">IHealthOwner</span> target<span class="token punctuation">,</span> <span class="token class-name">IDamageDealer</span> attacker<span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    <span class="token class-name"><span class="token keyword">var</span></span> args <span class="token operator">=</span> EventArgs_Damage<span class="token punctuation">.</span><span class="token function">Create</span><span class="token punctuation">(</span>attacker<span class="token punctuation">,</span> target<span class="token punctuation">,</span> damageInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">HandleEvent</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span>EEvent_Buff<span class="token punctuation">.</span>OnAfterReceiveDamage<span class="token punctuation">,</span> args<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    EventArgs_Damage<span class="token punctuation">.</span><span class="token function">Release</span><span class="token punctuation">(</span>args<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">private</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Unit_OnAfterDealDamage</span><span class="token punctuation">(</span><span class="token class-name">DamageInfo</span> damageInfo<span class="token punctuation">,</span> <span class="token class-name">IDamageDealer</span> attacker<span class="token punctuation">,</span> <span class="token class-name">IHealthOwner</span> target<span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    <span class="token class-name"><span class="token keyword">var</span></span> args <span class="token operator">=</span> EventArgs_Damage<span class="token punctuation">.</span><span class="token function">Create</span><span class="token punctuation">(</span>attacker<span class="token punctuation">,</span> target<span class="token punctuation">,</span> damageInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">HandleEvent</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span>EEvent_Buff<span class="token punctuation">.</span>OnBeforeDealDamage<span class="token punctuation">,</span> args<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    EventArgs_Damage<span class="token punctuation">.</span><span class="token function">Release</span><span class="token punctuation">(</span>args<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+</details>
+
+<h3 id="2-Action"><a href="#2-Action" class="headerlink" title="2.Action"></a>2.Action</h3><p>行动，buff执行逻辑的代理，非常类似行为树的Action节点。一般来讲，除非是非常简单的逻辑，否则都推荐调用各个模块里的方法来实现。</p>
+<p>Action设计为瞬时调用，调用完，对象将会被释放掉。</p>
+<p>所有的Action都是可以序列化配置的，将配置ActionConfig和运行时对象Action分开，使用多态序列化，可以直接在Inspector面板上编辑，非常方便。</p>
+<p>以下为造成伤害的实现：</p>
+<details><summary>Action_Damage 参考</summary>
+
+<pre class="language-csharp" data-language="csharp"><code class="language-csharp"><span class="token keyword">using</span> <span class="token namespace">System<span class="token punctuation">.</span>Collections<span class="token punctuation">.</span>Generic</span><span class="token punctuation">;</span>
+
+<span class="token keyword">namespace</span> <span class="token namespace">Saro<span class="token punctuation">.</span>Gameplay<span class="token punctuation">.</span>Ability</span>
+<span class="token punctuation">&#123;</span>
+    <span class="token punctuation">[</span><span class="token attribute"><span class="token class-name">System<span class="token punctuation">.</span>Serializable</span></span><span class="token punctuation">]</span>
+    <span class="token keyword">public</span> <span class="token keyword">sealed</span> <span class="token keyword">class</span> <span class="token class-name">ActionConfig_Damage</span> <span class="token punctuation">:</span> <span class="token type-list"><span class="token class-name">ActionConfig</span></span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token keyword">public</span> <span class="token class-name">IntValue</span> type<span class="token punctuation">;</span>
+        <span class="token keyword">public</span> <span class="token class-name">FloatValue</span> amount<span class="token punctuation">;</span>
+        <span class="token keyword">public</span> <span class="token class-name">IntValue</span> tag<span class="token punctuation">;</span>
+        <span class="token keyword">public</span> <span class="token class-name">BoolValue</span> currentHealthPercentBasedDamage<span class="token punctuation">;</span>
+        <span class="token keyword">public</span> <span class="token class-name">BoolValue</span> maxHealthPercentBasedDamage<span class="token punctuation">;</span>
+
+        <span class="token keyword">public</span> <span class="token keyword">override</span> <span class="token return-type class-name">BaseAction</span> <span class="token function">GetRuntimeObj</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token keyword">return</span> BaseAction<span class="token punctuation">.</span><span class="token generic-method"><span class="token function">GetRuntimeObj</span><span class="token generic class-name"><span class="token punctuation">&lt;</span>Action_Damage<span class="token punctuation">></span></span></span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token comment">/// &lt;summary></span>
+    <span class="token comment">/// 造成伤害，需要走伤害流程的，都要使用这个，而不能使用 &lt;see cref="Action_ModifyBase"/></span>
+    <span class="token comment">/// &lt;/summary></span>
+    <span class="token keyword">public</span> <span class="token keyword">sealed</span> <span class="token keyword">class</span> <span class="token class-name">Action_Damage</span> <span class="token punctuation">:</span> <span class="token type-list"><span class="token class-name">BaseAction</span></span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token keyword">public</span> <span class="token return-type class-name">ActionConfig_Damage</span> Cfg <span class="token operator">=></span> BaseCfg <span class="token keyword">as</span> <span class="token class-name">ActionConfig_Damage</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">public</span> <span class="token class-name"><span class="token keyword">int</span></span> type<span class="token punctuation">;</span>
+        <span class="token keyword">public</span> <span class="token class-name"><span class="token keyword">float</span></span> amount<span class="token punctuation">;</span>
+        <span class="token keyword">public</span> <span class="token class-name"><span class="token keyword">int</span></span> tag<span class="token punctuation">;</span>
+        <span class="token keyword">public</span> <span class="token class-name"><span class="token keyword">bool</span></span> currentHealthPercentBasedDamage<span class="token punctuation">;</span>
+        <span class="token keyword">public</span> <span class="token class-name"><span class="token keyword">bool</span></span> maxHealthPercentBasedDamage<span class="token punctuation">;</span>
+
+        <span class="token keyword">public</span> <span class="token keyword">override</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Invoke</span><span class="token punctuation">(</span><span class="token class-name">GameplayEventArgs</span> args<span class="token punctuation">,</span> <span class="token class-name"><span class="token keyword">int</span></span> evtID<span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            TargetSelector<span class="token punctuation">.</span><span class="token function">GetTargets</span><span class="token punctuation">(</span>Caster<span class="token punctuation">,</span> args<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name"><span class="token keyword">int</span></span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> TargetSelector<span class="token punctuation">.</span>Targets<span class="token punctuation">.</span>Count<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
+            <span class="token punctuation">&#123;</span>
+                <span class="token function">DealDamageToTarget</span><span class="token punctuation">(</span>TargetSelector<span class="token punctuation">.</span>Targets<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+        <span class="token punctuation">&#125;</span>
+
+        <span class="token keyword">public</span> <span class="token keyword">override</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">ResolveArgs</span><span class="token punctuation">(</span><span class="token class-name">IList<span class="token punctuation">&lt;</span><span class="token keyword">string</span><span class="token punctuation">></span></span> args<span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token class-name"><span class="token keyword">var</span></span> cfg <span class="token operator">=</span> Cfg<span class="token punctuation">;</span>
+            cfg<span class="token punctuation">.</span>amount<span class="token punctuation">.</span><span class="token function">Resolve</span><span class="token punctuation">(</span>args<span class="token punctuation">,</span> <span class="token keyword">ref</span> amount<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            cfg<span class="token punctuation">.</span>type<span class="token punctuation">.</span><span class="token function">Resolve</span><span class="token punctuation">(</span>args<span class="token punctuation">,</span> <span class="token keyword">ref</span> type<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            cfg<span class="token punctuation">.</span>tag<span class="token punctuation">.</span><span class="token function">Resolve</span><span class="token punctuation">(</span>args<span class="token punctuation">,</span> <span class="token keyword">ref</span> tag<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            cfg<span class="token punctuation">.</span>currentHealthPercentBasedDamage<span class="token punctuation">.</span><span class="token function">Resolve</span><span class="token punctuation">(</span>args<span class="token punctuation">,</span> <span class="token keyword">ref</span> currentHealthPercentBasedDamage<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            cfg<span class="token punctuation">.</span>maxHealthPercentBasedDamage<span class="token punctuation">.</span><span class="token function">Resolve</span><span class="token punctuation">(</span>args<span class="token punctuation">,</span> <span class="token keyword">ref</span> maxHealthPercentBasedDamage<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+
+        <span class="token keyword">private</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">DealDamageToTarget</span><span class="token punctuation">(</span><span class="token class-name">IHealthOwner</span> target<span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token comment">/*
+             * TODO 数值计算看怎么设计
+             * 目前只有 写死的最终值
+             */</span>
+
+            <span class="token class-name"><span class="token keyword">var</span></span> damage <span class="token operator">=</span> <span class="token number">0f</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>currentHealthPercentBasedDamage<span class="token punctuation">)</span>
+            <span class="token punctuation">&#123;</span>
+                damage <span class="token operator">=</span> target<span class="token punctuation">.</span>Health <span class="token operator">*</span> amount<span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+            <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>maxHealthPercentBasedDamage<span class="token punctuation">)</span>
+            <span class="token punctuation">&#123;</span>
+                damage <span class="token operator">=</span> target<span class="token punctuation">.</span>MaxHealth <span class="token operator">*</span> amount<span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+            <span class="token keyword">else</span>
+            <span class="token punctuation">&#123;</span>
+                damage <span class="token operator">=</span> amount<span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+
+            <span class="token class-name"><span class="token keyword">var</span></span> damageInfo <span class="token operator">=</span> DamageInfo<span class="token punctuation">.</span><span class="token function">Create</span><span class="token punctuation">(</span>type<span class="token punctuation">,</span> damage<span class="token punctuation">,</span> tag<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            DamageHelper<span class="token punctuation">.</span><span class="token function">ApplyDamage</span><span class="token punctuation">(</span>Caster<span class="token punctuation">,</span> target<span class="token punctuation">,</span> damageInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            DamageInfo<span class="token punctuation">.</span><span class="token function">Release</span><span class="token punctuation">(</span>damageInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            AbilityLog<span class="token punctuation">.</span><span class="token function">INFO</span><span class="token punctuation">(</span><span class="token interpolation-string"><span class="token string">$"</span><span class="token interpolation"><span class="token punctuation">&#123;</span><span class="token expression language-csharp"><span class="token keyword">nameof</span><span class="token punctuation">(</span>Action_Damage<span class="token punctuation">)</span></span><span class="token punctuation">&#125;</span></span><span class="token string">. [</span><span class="token interpolation"><span class="token punctuation">&#123;</span><span class="token expression language-csharp">Caster</span><span class="token punctuation">&#125;</span></span><span class="token string">] Apply Damage to [</span><span class="token interpolation"><span class="token punctuation">&#123;</span><span class="token expression language-csharp">target</span><span class="token punctuation">&#125;</span></span><span class="token string">]  [</span><span class="token interpolation"><span class="token punctuation">&#123;</span><span class="token expression language-csharp">damage</span><span class="token punctuation">&#125;</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">&#123;</span><span class="token expression language-csharp">type</span><span class="token punctuation">&#125;</span></span><span class="token string"> </span><span class="token interpolation"><span class="token punctuation">&#123;</span><span class="token expression language-csharp">tag</span><span class="token punctuation">&#125;</span></span><span class="token string">]"</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+</details>
+
+<h3 id="3-Target"><a href="#3-Target" class="headerlink" title="3.Target"></a>3.Target</h3><p>目标选择器，用于筛选目标。Action等对象，需要目标，可以通过此对象进行筛选，可以自行扩展。例如Target_UseEventArgs，此筛选器可以通过EventArgs筛选目标。</p>
+<!-- Target_UseAbility，可以使用Ability的目标。 -->
+
+<details>
+<summary>Target_UseEventArgs 参考</summary>
+<br>
+
+<pre class="language-csharp" data-language="csharp"><code class="language-csharp"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">TargetConfig_UseEventArgs</span> <span class="token punctuation">:</span> <span class="token type-list"><span class="token class-name">TargetConfig</span></span>
+<span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">override</span> <span class="token return-type class-name">ITargetSelector</span> <span class="token function">GetRuntimeObj</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token class-name"><span class="token keyword">var</span></span> obj <span class="token operator">=</span> SharedPool<span class="token punctuation">.</span><span class="token generic-method"><span class="token function">Rent</span><span class="token generic class-name"><span class="token punctuation">&lt;</span>Target_UseEventArgs<span class="token punctuation">></span></span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        obj<span class="token punctuation">.</span>Cfg <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">return</span> obj<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">/// &lt;summary></span>
+<span class="token comment">/// 使用 GameplayEventArgs 来筛选目标</span>
+<span class="token comment">/// &lt;/summary></span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Target_UseEventArgs</span> <span class="token punctuation">:</span> <span class="token type-list"><span class="token class-name">BaseTarget</span></span>
+<span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token return-type class-name">TargetConfig</span> Cfg <span class="token punctuation">&#123;</span> <span class="token keyword">get</span><span class="token punctuation">;</span> <span class="token keyword">set</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">override</span> <span class="token return-type class-name">ETargetType</span> TargetType <span class="token operator">=></span> Cfg<span class="token punctuation">.</span>targetType<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">override</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">GetTargets</span><span class="token punctuation">(</span><span class="token class-name">GameplayEventArgs</span> args<span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>args <span class="token keyword">is</span> <span class="token class-name">EventArgs_Damage</span> _damageArgs<span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>TargetType<span class="token punctuation">.</span><span class="token function">HasFlag</span><span class="token punctuation">(</span>ETargetType<span class="token punctuation">.</span>Target<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">&#123;</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>_damageArgs<span class="token punctuation">.</span>Target <span class="token keyword">is</span> <span class="token class-name">ICombatUnit</span> _combatUnit<span class="token punctuation">)</span>
+                <span class="token punctuation">&#123;</span>
+                    Targets<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span>_combatUnit<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">&#125;</span>
+            <span class="token punctuation">&#125;</span>
+
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>TargetType<span class="token punctuation">.</span><span class="token function">HasFlag</span><span class="token punctuation">(</span>ETargetType<span class="token punctuation">.</span>Caster<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">&#123;</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>_damageArgs<span class="token punctuation">.</span>Attacker <span class="token keyword">is</span> <span class="token class-name">ICombatUnit</span> _combatUnit<span class="token punctuation">)</span>
+                <span class="token punctuation">&#123;</span>
+                    <span class="token comment">// Target Caster 可能是相同 对象，需要处理下</span>
+                    Targets<span class="token punctuation">.</span><span class="token function">AddUnique</span><span class="token punctuation">(</span>_combatUnit<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">&#125;</span>
+            <span class="token punctuation">&#125;</span>
+        <span class="token punctuation">&#125;</span>
+        <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>args <span class="token keyword">is</span> <span class="token class-name">EventArgs_BuffGeneric</span> _buffGenericArgs<span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>TargetType<span class="token punctuation">.</span><span class="token function">HasFlag</span><span class="token punctuation">(</span>ETargetType<span class="token punctuation">.</span>Target<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">&#123;</span>
+                Targets<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span>_buffGenericArgs<span class="token punctuation">.</span>Buff<span class="token punctuation">.</span>Target<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>TargetType<span class="token punctuation">.</span><span class="token function">HasFlag</span><span class="token punctuation">(</span>ETargetType<span class="token punctuation">.</span>Caster<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">&#123;</span>
+                <span class="token comment">// Target Caster 可能是相同 对象，需要处理下</span>
+
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>_buffGenericArgs<span class="token punctuation">.</span>Buff<span class="token punctuation">.</span>Caster <span class="token operator">!=</span> <span class="token keyword">null</span><span class="token punctuation">)</span>
+                <span class="token punctuation">&#123;</span>
+                    Targets<span class="token punctuation">.</span><span class="token function">AddUnique</span><span class="token punctuation">(</span>_buffGenericArgs<span class="token punctuation">.</span>Buff<span class="token punctuation">.</span>Caster<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">&#125;</span>
+            <span class="token punctuation">&#125;</span>
+        <span class="token punctuation">&#125;</span>
+        <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>args <span class="token keyword">is</span> <span class="token class-name">EventArgs_BuffStack</span> _buffStackArgs<span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token class-name">Buff</span> buff <span class="token operator">=</span> <span class="token punctuation">(</span>Buff<span class="token punctuation">)</span>_buffStackArgs<span class="token punctuation">.</span>Handle<span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>buff <span class="token operator">!=</span> <span class="token keyword">null</span><span class="token punctuation">)</span>
+            <span class="token punctuation">&#123;</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>TargetType<span class="token punctuation">.</span><span class="token function">HasFlag</span><span class="token punctuation">(</span>ETargetType<span class="token punctuation">.</span>Caster<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token punctuation">&#123;</span>
+                    <span class="token comment">// Target Caster 可能是相同 对象，需要处理下</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>buff<span class="token punctuation">.</span>Caster <span class="token operator">!=</span> <span class="token keyword">null</span><span class="token punctuation">)</span>
+                    <span class="token punctuation">&#123;</span>
+                        Targets<span class="token punctuation">.</span><span class="token function">AddUnique</span><span class="token punctuation">(</span>buff<span class="token punctuation">.</span>Caster<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">&#125;</span>
+                <span class="token punctuation">&#125;</span>
+
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>TargetType<span class="token punctuation">.</span><span class="token function">HasFlag</span><span class="token punctuation">(</span>ETargetType<span class="token punctuation">.</span>Target<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token punctuation">&#123;</span>
+                    Targets<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span>buff<span class="token punctuation">.</span>Target<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">&#125;</span>
+            <span class="token punctuation">&#125;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+</details>
+
+<h2 id="Buff自身逻辑"><a href="#Buff自身逻辑" class="headerlink" title="Buff自身逻辑"></a>Buff自身逻辑</h2><h3 id="1-属性改变"><a href="#1-属性改变" class="headerlink" title="1.属性改变"></a>1.属性改变</h3><p>使用<a href="/2022/01/30/unity/%E6%B8%B8%E6%88%8F%E7%8E%A9%E6%B3%95/%E6%B8%B8%E6%88%8F%E6%80%A7%E5%B1%9E%E6%80%A7">GameplayAttribute</a>，游戏性属性。buff成员变量，包含一个MofifierConfig数组，可以通过表格来配置，buff生效时，会应用属性，销毁时，会移除应用的属性。</p>
+<h3 id="2-状态改变"><a href="#2-状态改变" class="headerlink" title="2.状态改变"></a>2.状态改变</h3><p>使用<a href="/2022/01/09/unity/%E6%B8%B8%E6%88%8F%E7%8E%A9%E6%B3%95/%E6%B8%B8%E6%88%8F%E6%80%A7%E6%A0%87%E7%AD%BE">GameplayTag</a>，游戏性标记。buff生效时，都会给buffContainter添加一些配置的tag，通过这个tag，来判断状态，所有buff自己管理自己的tag就够了，buffContainer可以自己处理tag叠加问题，并且提供了tag数量变化的事件，其他模块可以很方便监听，实现tag的响应。</p>
+<h3 id="3-堆叠和溢出"><a href="#3-堆叠和溢出" class="headerlink" title="3.堆叠和溢出"></a>3.堆叠和溢出</h3><p>buff堆叠，会抛出堆叠事件，通过自定义Action进行游戏逻辑处理。</p>
+<p>堆叠时，属性改变也会被堆叠，层数减少时，属性改变也会相应减少。（TODO考虑新增一个参数，控制堆叠是否影响属性改变）</p>
+<p>当buff堆叠超过最大堆叠数量限制时，会抛出溢出事件。</p>
+<h3 id="4-buff的施加和驱散"><a href="#4-buff的施加和驱散" class="headerlink" title="4.buff的施加和驱散"></a>4.buff的施加和驱散</h3><p>也是使用<a href="/2022/01/09/unity/%E6%B8%B8%E6%88%8F%E7%8E%A9%E6%B3%95/%E6%B8%B8%E6%88%8F%E6%80%A7%E6%A0%87%E7%AD%BE">GameplayTag</a>，buff自身包含一系列tag。</p>
+<ul>
+<li>grantedTags，生效时，授予的tags</li>
+<li>applicationTagRequirements，应用时，需要满足的tags</li>
+<li>onGoingTagRequirements，生效期间，满足条件，才会走buff period事件，但不会影响应用属性、grantedTags等瞬时操作。</li>
+</ul>
+<!-- - removalTagRequirements
+- removeGameplayEffectsWithTags -->
+
+<p>除了可以通过tag驱散，也可以直接通过buffID、buffHandle驱散，但一般推荐tag，tag可以代表一个系列buff的集合。</p>
+<p>通过DestroyBuff(Buff buff, object destroyer)，传入destroyer，可以判定是自然结束，还是被其他人销毁</p>
+<h3 id="5-buff时间策略"><a href="#5-buff时间策略" class="headerlink" title="5.buff时间策略"></a>5.buff时间策略</h3><h4 id="持续时间-duration"><a href="#持续时间-duration" class="headerlink" title="持续时间(duration)"></a>持续时间(duration)</h4><ul>
+<li>应用buff时，是否刷新已存在buff的duration</li>
+<li>每层结束后，是否刷新duration。不刷新，则清空所有层数，并移除buff；刷新，则减少一层，重新计时</li>
+<li>每层结束或，刷新duration，且抛出事件，可以自定义层数事件，例如，让duration根据层数变化等。</li>
+</ul>
+<h4 id="buff生效周期-period"><a href="#buff生效周期-period" class="headerlink" title="buff生效周期(period)"></a>buff生效周期(period)</h4><ul>
+<li>应用buff时，是否刷新period</li>
+</ul>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>逻辑数据，在Inspector直接配置多态数据，使用Odin插件，序列化为json，也可以考虑序列化成protobuf。</p>
+<p>等级之类的数值数据，采用配置表配置。新增ValueSource类，处理是否使用表格数据。</p>
+<details><summary>配置 参考</summary>
+
+<img src="pic0.jpg" loading="lazy">
+
+<img src="pic1.jpg" loading="lazy">
+</details>
+
+<h2 id="扩展性"><a href="#扩展性" class="headerlink" title="扩展性"></a>扩展性</h2><h3 id="1-数据驱动话配置"><a href="#1-数据驱动话配置" class="headerlink" title="1.数据驱动话配置"></a>1.数据驱动话配置</h3><ul>
+<li>通过c#自定义可复用Action，数据驱动组合，已经可以在编辑器面板，制作很多buff了</li>
+</ul>
+<h3 id="2-脚本化buff-IScriptRunner"><a href="#2-脚本化buff-IScriptRunner" class="headerlink" title="2.脚本化buff(IScriptRunner)"></a>2.脚本化buff(IScriptRunner)</h3><ul>
+<li>支持c#字符串和委托绑定，继承ICSharpScript</li>
+<li>lua支持</li>
+</ul>
+<details><summary>lua支持 参考</summary>
+
+<pre class="language-lua" data-language="lua"><code class="language-lua"><span class="token function">require</span><span class="token punctuation">(</span><span class="token string">"AbilityInterface"</span><span class="token punctuation">)</span>
+
+<span class="token keyword">local</span> buff1001 <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+
+<span class="token comment">-- 重写哪些事件</span>
+<span class="token keyword">function</span> buff1001<span class="token punctuation">:</span><span class="token function">DeclareFunctions</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">local</span> funcs <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+        <span class="token number">1</span><span class="token punctuation">,</span> <span class="token comment">-- OnBuffCreated</span>
+        <span class="token number">3</span><span class="token punctuation">,</span> <span class="token comment">-- OnBuffPeriod</span>
+        <span class="token number">27</span> <span class="token comment">-- OnAfterReceiveDamage</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">return</span> funcs
+<span class="token keyword">end</span>
+
+<span class="token keyword">function</span> buff1001<span class="token punctuation">:</span><span class="token function">OnBuffCreated</span><span class="token punctuation">(</span>args<span class="token punctuation">)</span>
+    <span class="token comment">-- 读取buff数据表的用户数据</span>
+    <span class="token keyword">local</span> buffDataArgs <span class="token operator">=</span> args<span class="token punctuation">.</span>buff<span class="token punctuation">.</span>Data<span class="token punctuation">.</span>Args
+    <span class="token keyword">local</span> arg0 <span class="token operator">=</span> <span class="token function">tonumber</span><span class="token punctuation">(</span>buffDataArgs<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token keyword">local</span> arg1 <span class="token operator">=</span> <span class="token function">tonumber</span><span class="token punctuation">(</span>buffDataArgs<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token keyword">local</span> arg2 <span class="token operator">=</span> <span class="token function">tonumber</span><span class="token punctuation">(</span>buffDataArgs<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">local</span> attributeSet <span class="token operator">=</span> args<span class="token punctuation">.</span>buff<span class="token punctuation">.</span>Target<span class="token punctuation">.</span>AttributeSet
+    attributeSet<span class="token punctuation">:</span><span class="token function">ApplyModifier</span><span class="token punctuation">(</span>arg0<span class="token punctuation">,</span> arg2<span class="token punctuation">,</span> arg1<span class="token punctuation">,</span> args<span class="token punctuation">.</span>buff<span class="token punctuation">)</span>
+<span class="token keyword">end</span>
+
+<span class="token keyword">function</span> buff1001<span class="token punctuation">:</span><span class="token function">OnBuffPeriod</span><span class="token punctuation">(</span>args<span class="token punctuation">)</span>
+    <span class="token function">print</span><span class="token punctuation">(</span><span class="token string">"buff1001 OnBuffPeriod. args: ["</span> <span class="token operator">..</span> args<span class="token punctuation">:</span><span class="token function">ToString</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">..</span> <span class="token string">"]"</span><span class="token punctuation">)</span>
+<span class="token keyword">end</span>
+
+<span class="token keyword">function</span> buff1001<span class="token punctuation">:</span><span class="token function">OnAfterReceiveDamage</span><span class="token punctuation">(</span>args<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> args<span class="token punctuation">.</span>damageInfo<span class="token punctuation">.</span>damageTag<span class="token punctuation">:</span><span class="token function">HasFlag</span><span class="token punctuation">(</span>EDamageTag<span class="token punctuation">.</span>NoReflect<span class="token punctuation">)</span> <span class="token keyword">then</span>
+        <span class="token keyword">return</span>
+    <span class="token keyword">end</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>args<span class="token punctuation">.</span>attacker <span class="token operator">==</span> <span class="token keyword">nil</span><span class="token punctuation">)</span> <span class="token keyword">then</span>
+        <span class="token keyword">return</span>
+    <span class="token keyword">end</span>
+
+    <span class="token comment">-- 造成2.2倍反击伤害</span>
+    <span class="token keyword">local</span> finalDamage <span class="token operator">=</span> math<span class="token punctuation">.</span><span class="token function">floor</span><span class="token punctuation">(</span>args<span class="token punctuation">.</span>damageInfo<span class="token punctuation">.</span>amount <span class="token operator">*</span> <span class="token number">2.2</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">local</span> damageInfo <span class="token operator">=</span> DamageInfo<span class="token punctuation">:</span><span class="token function">Create</span><span class="token punctuation">(</span>EDamageType<span class="token punctuation">.</span>Magical<span class="token punctuation">,</span> finalDamage<span class="token punctuation">,</span> EDamageTag<span class="token punctuation">.</span>NoReflect<span class="token punctuation">)</span>
+
+    DamageHelper<span class="token punctuation">:</span><span class="token function">ApplyDamage</span><span class="token punctuation">(</span>args<span class="token punctuation">.</span>target<span class="token punctuation">,</span> args<span class="token punctuation">.</span>attacker<span class="token punctuation">,</span> damageInfo<span class="token punctuation">)</span>
+
+    DamageInfo<span class="token punctuation">:</span><span class="token function">Release</span><span class="token punctuation">(</span>damageInfo<span class="token punctuation">)</span>
+
+    <span class="token comment">-- 眩晕攻击者</span>
+    args<span class="token punctuation">.</span>attacker<span class="token punctuation">.</span>BuffContainer<span class="token punctuation">:</span><span class="token function">ApplyBuff</span><span class="token punctuation">(</span><span class="token number">1002</span><span class="token punctuation">,</span> args<span class="token punctuation">.</span>target<span class="token punctuation">)</span>
+<span class="token keyword">end</span>
+
+<span class="token keyword">return</span> buff1001</code></pre>
+</details>
+
+<h2 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h2><ul>
+<li>如何设计游戏事件，提高buff系统的健壮性、扩展性</li>
+</ul>
+<!-- ### 实现样板
+
+- dot效果。燃烧，每秒掉xx血。
+- 受到攻击后，触发事件。反击螺旋、人马皮。
+- 宙斯c。弹道弹射，伤害递减。
+- 辉耀。一定范围，每x秒aoe伤害、攻击miss。
+- 死骑被动，一定时间攻击三次目标，目标会受到额外伤害，沉默和减速。 -->
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.valvesoftware.com/wiki/Dota_2_Workshop_Tools:zh-cn/Scripting:zh-cn/Abilities_Data_Driven:zh-cn">Dota2数据驱动技能</a></li>
+<li><a target="_blank" rel="noopener" href="https://bbs.gameres.com/forum.php?mod=viewthread&tid=215027">Buff机制及其实际运用</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/tranek/GASDocumentation">UE4 GAS</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/150812545">如何实现一个强大的MMO技能系统——BUFF</a></li>
+</ul>
+</div></section><ul class="post-copyright"><li class="post-copyright-author"><strong>本文作者：</strong>星星</li><li class="post-copyright-link"><strong>本文链接：</strong><a href="https://sarofc.gitee.io/2021/09/06/unity/%E6%B8%B8%E6%88%8F%E7%8E%A9%E6%B3%95/Ability1Buff/" title="技能系统(一) Buff">https://sarofc.gitee.io/2021/09/06/unity/%E6%B8%B8%E6%88%8F%E7%8E%A9%E6%B3%95/Ability1Buff/</a></li><li class="post-copyright-license"><strong>版权声明：</strong>本博客所有文章除特别声明外，均默认采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener" title="CC BY-NC-SA 4.0 "><svg class="icon"><use xlink:href="#icon-creative-commons-line"></use></svg><svg class="icon"><use xlink:href="#icon-creative-commons-by-line"></use></svg><svg class="icon"><use xlink:href="#icon-creative-commons-nc-line"></use></svg><svg class="icon"><use xlink:href="#icon-creative-commons-sa-line"></use></svg></a> 许可协议。</li></ul></article><div class="post-nav"><div class="post-nav-item"><a class="post-nav-prev" href="/2021/10/29/unity/%E5%9F%BA%E7%A1%80%E6%A1%86%E6%9E%B6/ugui%E7%BB%84%E4%BB%B6%E7%BB%91%E5%AE%9A%E5%92%8C%E4%BB%A3%E7%A0%81%E7%94%9F%E6%88%90/" rel="prev" title="ugui组件绑定和代码生成"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-arrow-left-s-line"></use></svg><span class="post-nav-text">ugui组件绑定和代码生成</span></a></div><div class="post-nav-item"><a class="post-nav-next" href="/2021/03/09/unity/%E5%9F%BA%E7%A1%80%E6%A1%86%E6%9E%B6/MGF1%E6%A1%86%E6%9E%B6%E5%90%AF%E5%8A%A8/" rel="next" title="Moon Game Framework(一)"><span class="post-nav-text">Moon Game Framework(一)</span><svg class="icon" aria-hidden="true"><use xlink:href="#icon-arrow-right-s-line"></use></svg></a></div></div></div><div class="hty-card" id="comment"><div class="comment-tooltip text-center"><span>要不要和我说些什么？</span><br></div><div id="valine-container"></div><script type="module">import { getScript } from '/js/utils.js'
+getScript("https://fastly.jsdelivr.net/npm/valine@latest/dist/Valine.min.js", () => {
+  const valineConfig = {"enable":true,"appId":"4f4thF3LKGni6l4CAB08D3dE-gzGzoHsz","appKey":"p9RGSDvRFxjHsDJhvX5MgViA","placeholder":"说点什么","avatar":"mp","pageSize":10,"visitor":false,"highlight":true,"recordIP":true,"enableQQ":true,"meta":["nick","mail","link"],"lang":"zh-cn","serverURLs":"https://4f4thf3l.lc-cn-n1-shared.com","requiredFields":["nick"],"el":"#valine-container"}
+  valineConfig.path = "/2021/09/06/unity/%E6%B8%B8%E6%88%8F%E7%8E%A9%E6%B3%95/Ability1Buff/"
+  new Valine(valineConfig)
+}, window.Valine);</script></div></main><footer class="sidebar-translate" id="footer"><div class="copyright"><span>&copy; 2019 – 2022 </span><span class="with-love" id="animate"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-cloud-line"></use></svg></span><span class="author"> 星星</span></div><div class="powered"><span>由 <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 驱动 v6.2.0</span><span class="footer-separator">|</span><span>主题 - <a rel="noopener" href="https://github.com/YunYouJun/hexo-theme-yun" target="_blank"><span>Yun</span></a> v1.9.3</span></div><div id="busuanzi"><span id="busuanzi_container_site_uv" title="总访客量"><span><svg class="icon" aria-hidden="true"><use xlink:href="#icon-user-line"></use></svg></span><span id="busuanzi_value_site_uv"></span></span><span class="footer-separator">|</span><span id="busuanzi_container_site_pv" title="总访问量"><span><svg class="icon" aria-hidden="true"><use xlink:href="#icon-eye-line"></use></svg></span><span id="busuanzi_value_site_pv"></span></span><script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></footer><a class="hty-icon-button" id="back-to-top" aria-label="back-to-top" href="#"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-arrow-up-s-line"></use></svg><svg class="progress-circle-container" viewBox="0 0 100 100"><circle class="progress-circle" id="progressCircle" cx="50" cy="50" r="48" fill="none" stroke="#0078E7" stroke-width="2" stroke-linecap="round"></circle></svg></a><div class="aplayer no-destroy" id="aplayer" data-id="98381187" data-server="netease" data-type="playlist" data-fixed="true" data-theme="#0078E7" data-loop="all" data-order="list" data-preload="auto" data-volume="0.1" data-mutex data-lrctype="0" data-listmaxheight="340px" data-storagename="metingjs"></div></div></body></html>
