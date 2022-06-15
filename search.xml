@@ -20,11 +20,11 @@
       
         <tags>
             
-            <tag> unity </tag>
+            <tag> c# </tag>
             
             <tag> gamedev </tag>
             
-            <tag> c# </tag>
+            <tag> unity </tag>
             
         </tags>
       
@@ -49,9 +49,9 @@
       
         <tags>
             
-            <tag> unity </tag>
-            
             <tag> gamedev </tag>
+            
+            <tag> unity </tag>
             
         </tags>
       
@@ -89,7 +89,7 @@
       <link href="/2022/03/18/unity/%E6%B8%B8%E6%88%8F%E7%8E%A9%E6%B3%95/ecs/"/>
       <url>/2022/03/18/unity/%E6%B8%B8%E6%88%8F%E7%8E%A9%E6%B3%95/ecs/</url>
       
-        <content type="html"><![CDATA[<h2 id="库"><a href="#库" class="headerlink" title="库"></a>库</h2><ul><li><a href="https://github.com/sschmid/Entitas-CSharp">Entitas-CSharp</a>（class based, oop）</li><li><a href="https://github.com/Leopotam/ecslite">ecslite</a>（struct based, sparse set）</li></ul><h2 id="库的对比"><a href="#库的对比" class="headerlink" title="库的对比"></a>库的对比</h2><p><a href="https://github.com/Chillu1/CSharpECSComparison">https://github.com/Chillu1/CSharpECSComparison</a></p><h2 id="库的性能测试"><a href="#库的性能测试" class="headerlink" title="库的性能测试"></a>库的性能测试</h2><p><a href="https://github.com/Doraku/Ecs.CSharp.Benchmark">https://github.com/Doraku/Ecs.CSharp.Benchmark</a></p><h2 id="库的选择"><a href="#库的选择" class="headerlink" title="库的选择"></a>库的选择</h2><p>选用<code>ecslite</code></p><ol><li>代码量简洁，易于修改、扩展</li><li>没有代码生成，干净</li></ol><h2 id="问题点"><a href="#问题点" class="headerlink" title="问题点"></a>问题点</h2><ol><li>如果使用request/event（添加component）来处理system间的“通信”，怎么决定request/event是存活一帧、两帧？还是延迟一帧再调用？还是某个system里自行消耗（移除component）？也可以是component包含一个queue容器，每帧依次消耗？<br><del>2. 如何从oop向dop转变？如何设计dop模型？</del></li><li>ecs如何模块化？并尽量保证不受执行顺序影响？如何编写模块测试？</li><li>如何从gameobject获取到entity对象？安全？方便？性能？</li><li>能否和现有oop代码结合？例如封装到c或者s里去？</li><li>system无状态，那么状态可以保存到哪里？</li><li>单例组件？</li><li> 如何减少大量相同代码？如何复用？system能不能使用继承？有何优劣？</li><li> 出现bug，如何调试？从哪些方面入手？</li><li>如何让一些system在entity变化时，抛出事件，减少system的遍历？需不需要？</li><li>如何使用jobsystem？</li><li>如何处理包含关系？见Q.1</li><li>如何描述层级结构？例如场景节点树</li><li>不同ecs框架，如何安全创建/销毁ent？</li><li>ecs是否需要代码生成？</li><li>如何使用ecs制作网络游戏？客户端预测？客户端回滚？回放？</li></ol><h2 id="使用ecs"><a href="#使用ecs" class="headerlink" title="使用ecs"></a>使用ecs</h2><p><strong>组织模块</strong></p><p>例如 CameraFeature 包含 CameraZoomSystem 和 CameraMoveSystem</p><p><strong>组件特性</strong></p><!-- IEcsIgnoreInFilter，不会被过滤 --><p>IEcsAutoReset，自动重置，用于清理资源，处理引用类型</p><p><strong>ReactiveSystem</strong></p><p>开启 LEOECS_FILTER_EVENTS 宏，init里使用接口添加自己的监听实现类（待验证）<br>。这样可以不用实现run接口，避免大量forloop。</p><p>使用array+interface实现的监听，非委托的方式，gc更少，但没有多线程支持</p><h2 id="ecs的评估"><a href="#ecs的评估" class="headerlink" title="ecs的评估"></a>ecs的评估</h2><p><strong>ecs的优势</strong></p><ol><li>比ec更进一步，更细分，扁平化，也更抽象</li><li>逻辑数据完全分离</li><li>利于内存排布、多线程，提高性能（打个问号）</li></ol><p><strong>ecs的劣势</strong></p><ol><li>过于规范化？</li><li>难抽象</li><li>class数量变多（打个问号）</li><li>system严格的执行顺序</li><li>system之间的通信问题（打个问号）</li></ol><h2 id="Q-amp-A"><a href="#Q-amp-A" class="headerlink" title="Q &amp; A"></a>Q &amp; A</h2><p><strong>Q.1.</strong> ECS模型按列解耦功能确实挺好的，但是对于树形结构的数据，比如一场战斗有两个玩家，每个玩家有三个英雄，每个英雄有四个技能，每个技能有五段攻击。该如何设计才能更合理呢？</p><p><strong>A.</strong> 这种叫做 Component 的引用，在我的库中有专门额外结构解决这类问题。在上文中已经提到过了。</p><p>那么，“比如一场战斗有两个玩家”，就可以把“战斗”看成是一个独立的 Component ，玩家则引用它。“战斗”这个 Component 并没有归属到两个玩家中的特定一个。</p><p>我们可以</p><ol><li>用一个 system 遍历玩家，把战斗需要的信息复制到关联的“战斗”中。</li><li>用一个 system 遍历战斗，结算战斗结果。</li><li>用一个 system 遍历玩家，取出战斗结果。</li></ol><p>以上 1 和 3 均可以用 tag 标记出涉及战斗的玩家，过滤掉未参加任何战斗的玩家。</p><p><strong>Q.2.</strong> 如何序列化/反序列化Entity？</p><p><strong>A.</strong> 配置表加载，代码生成；使用unity的序列化制作蓝图，IConvertToEntity；</p><p><strong>Q.3.</strong> Is it safe to store a List<GameEntity> in a Component？</p><p><strong>A.</strong> <a href="https://github.com/sschmid/Entitas-CSharp/issues/964">https://github.com/sschmid/Entitas-CSharp/issues/964</a></p><h2 id="关于接入已有工作流"><a href="#关于接入已有工作流" class="headerlink" title="关于接入已有工作流"></a>关于接入已有工作流</h2><ol><li>GameMode使用oop（可以是一个system基类？）</li><li>定义各种GameMode所有资源路径，excel/scriptableobj都可以</li><li>使用GameContext类定义GameMode上下文数据，这一块，可以自由发挥，用oop/ec都无所谓</li><li>数据集中化，可以使用asset接口异步预加载/下载资源，并且可以方便做池化，也可以延迟到使用时再加载</li><li>GameMode里注册各种system，inject数据，启动ecs world</li></ol><h2 id="demo"><a href="#demo" class="headerlink" title="demo"></a>demo</h2><p>ecslite都是简单的demo，可以去参考entities-csharp，有网络同步相关的demo</p><p><a href="https://habr.com/ru/post/661085/">https://habr.com/ru/post/661085/</a></p><p><a href="https://github.com/sschmid/Entitas-CSharp/wiki/Tutorials">https://github.com/sschmid/Entitas-CSharp/wiki/Tutorials</a></p><h2 id="references"><a href="#references" class="headerlink" title="references"></a>references</h2><p><a href="https://blog.codingnow.com/2021/07/lua_ecs.html">https://blog.codingnow.com/2021/07/lua_ecs.html</a></p><p>// TODO 守望先锋ppt</p><h2 id="AbilitySystem"><a href="#AbilitySystem" class="headerlink" title="AbilitySystem"></a>AbilitySystem</h2><p>TODO 究竟是oop的技能系统兼容ecs，还是纯ecs的技能系统？</p>]]></content>
+        <content type="html"><![CDATA[<h2 id="库"><a href="#库" class="headerlink" title="库"></a>库</h2><ul><li><a href="https://github.com/sschmid/Entitas-CSharp">Entitas-CSharp</a>（class based, oop）</li><li><a href="https://github.com/Leopotam/ecslite">ecslite</a>（struct based, sparse set）</li></ul><h2 id="库的对比"><a href="#库的对比" class="headerlink" title="库的对比"></a>库的对比</h2><p><a href="https://github.com/Chillu1/CSharpECSComparison">https://github.com/Chillu1/CSharpECSComparison</a></p><h2 id="库的性能测试"><a href="#库的性能测试" class="headerlink" title="库的性能测试"></a>库的性能测试</h2><p><a href="https://github.com/Doraku/Ecs.CSharp.Benchmark">https://github.com/Doraku/Ecs.CSharp.Benchmark</a></p><h2 id="库的选择"><a href="#库的选择" class="headerlink" title="库的选择"></a>库的选择</h2><p>选用<code>ecslite</code></p><ol><li>代码简洁，易于修改、扩展</li><li>没有代码生成，干净</li></ol><h2 id="问题点"><a href="#问题点" class="headerlink" title="问题点"></a>问题点</h2><ol><li>如果使用request/event（添加component）来处理system间的“通信”，怎么决定request/event是存活一帧、两帧？还是延迟一帧再调用？还是某个system里自行消耗（移除component）？也可以是component包含一个queue容器，每帧依次消耗？<br><del>2. 如何从oop向dop转变？如何设计dop模型？</del></li><li>ecs如何模块化？并尽量保证不受执行顺序影响？如何编写模块测试？</li><li>如何从gameobject获取到entity对象？安全？方便？性能？</li><li>能否和现有oop代码结合？例如封装到c或者s里去？</li><li>system无状态，那么状态可以保存到哪里？</li><li>单例组件？</li><li> 如何减少大量相同代码？如何复用？system能不能使用继承？有何优劣？</li><li> 出现bug，如何调试？从哪些方面入手？</li><li>如何让一些system在entity变化时，抛出事件，减少system的遍历？需不需要？</li><li>如何使用jobsystem？</li><li>如何处理包含关系？见Q.1</li><li>如何描述层级结构？例如场景节点树</li><li>不同ecs框架，如何安全创建/销毁ent？</li><li>ecs是否需要代码生成？</li><li>如何使用ecs制作网络游戏？客户端预测？客户端回滚？回放？</li></ol><h2 id="使用ecs"><a href="#使用ecs" class="headerlink" title="使用ecs"></a>使用ecs</h2><p><strong>组织模块</strong></p><p>例如 CameraFeature 包含 CameraZoomSystem 和 CameraMoveSystem</p><p><strong>组件特性</strong></p><!-- IEcsIgnoreInFilter，不会被过滤 --><p>IEcsAutoReset，自动重置，用于清理资源，处理引用类型</p><p><strong>ReactiveSystem</strong></p><p>开启 LEOECS_FILTER_EVENTS 宏，init里使用接口添加自己的监听实现类（待验证）<br>。这样可以不用实现run接口，避免大量forloop。</p><p>使用array+interface实现的监听，非委托的方式，gc更少，但没有多线程支持</p><h2 id="ecs的评估"><a href="#ecs的评估" class="headerlink" title="ecs的评估"></a>ecs的评估</h2><p><strong>ecs的优势</strong></p><ol><li>比ec更进一步，更细分，扁平化，也更抽象</li><li>逻辑数据完全分离</li><li>利于内存排布、多线程，提高性能（打个问号）</li></ol><p><strong>ecs的劣势</strong></p><ol><li>过于规范化？</li><li>难抽象</li><li>class数量变多（打个问号）</li><li>system严格的执行顺序</li><li>system之间的通信问题（打个问号）</li></ol><h2 id="Q-amp-A"><a href="#Q-amp-A" class="headerlink" title="Q &amp; A"></a>Q &amp; A</h2><p><strong>Q.1.</strong> ECS模型按列解耦功能确实挺好的，但是对于树形结构的数据，比如一场战斗有两个玩家，每个玩家有三个英雄，每个英雄有四个技能，每个技能有五段攻击。该如何设计才能更合理呢？</p><p><strong>A.</strong> 这种叫做 Component 的引用，在我的库中有专门额外结构解决这类问题。在上文中已经提到过了。</p><p>那么，“比如一场战斗有两个玩家”，就可以把“战斗”看成是一个独立的 Component ，玩家则引用它。“战斗”这个 Component 并没有归属到两个玩家中的特定一个。</p><p>我们可以</p><ol><li>用一个 system 遍历玩家，把战斗需要的信息复制到关联的“战斗”中。</li><li>用一个 system 遍历战斗，结算战斗结果。</li><li>用一个 system 遍历玩家，取出战斗结果。</li></ol><p>以上 1 和 3 均可以用 tag 标记出涉及战斗的玩家，过滤掉未参加任何战斗的玩家。</p><p><strong>Q.2.</strong> 如何序列化/反序列化Entity？</p><p><strong>A.</strong> 配置表加载，代码生成；使用unity的序列化制作蓝图，IConvertToEntity；</p><p><strong>Q.3.</strong> Is it safe to store a List<GameEntity> in a Component？</p><p><strong>A.</strong> <a href="https://github.com/sschmid/Entitas-CSharp/issues/964">https://github.com/sschmid/Entitas-CSharp/issues/964</a></p><h2 id="关于接入已有工作流"><a href="#关于接入已有工作流" class="headerlink" title="关于接入已有工作流"></a>关于接入已有工作流</h2><ol><li>GameMode使用oop（可以是一个system基类？）</li><li>定义各种GameMode所有资源路径，excel/scriptableobj都可以</li><li>使用GameContext类定义GameMode上下文数据，这一块，可以自由发挥，用oop/ec都无所谓</li><li>数据集中化，可以使用asset接口异步预加载/下载资源，并且可以方便做池化，也可以延迟到使用时再加载</li><li>GameMode里注册各种system，inject数据，启动ecs world</li></ol><h2 id="demo"><a href="#demo" class="headerlink" title="demo"></a>demo</h2><p>ecslite都是简单的demo，可以去参考entities-csharp，有网络同步相关的demo</p><p><a href="https://habr.com/ru/post/661085/">https://habr.com/ru/post/661085/</a></p><p><a href="https://github.com/sschmid/Entitas-CSharp/wiki/Tutorials">https://github.com/sschmid/Entitas-CSharp/wiki/Tutorials</a></p><h2 id="references"><a href="#references" class="headerlink" title="references"></a>references</h2><p><a href="https://blog.codingnow.com/2021/07/lua_ecs.html">https://blog.codingnow.com/2021/07/lua_ecs.html</a></p><p>// TODO 守望先锋ppt</p><h2 id="AbilitySystem"><a href="#AbilitySystem" class="headerlink" title="AbilitySystem"></a>AbilitySystem</h2><p>TODO 究竟是oop的技能系统兼容ecs，还是纯ecs的技能系统？</p>]]></content>
       
       
       <categories>
@@ -101,9 +101,9 @@
       
         <tags>
             
-            <tag> unity </tag>
-            
             <tag> gamedev </tag>
+            
+            <tag> unity </tag>
             
             <tag> ecs </tag>
             
@@ -130,13 +130,13 @@
       
         <tags>
             
-            <tag> unity </tag>
-            
             <tag> gamedev </tag>
             
-            <tag> ecs </tag>
+            <tag> unity </tag>
             
             <tag> gameplay </tag>
+            
+            <tag> ecs </tag>
             
         </tags>
       
@@ -161,9 +161,9 @@
       
         <tags>
             
-            <tag> unity </tag>
-            
             <tag> gamedev </tag>
+            
+            <tag> unity </tag>
             
             <tag> gameplay </tag>
             
@@ -190,9 +190,9 @@
       
         <tags>
             
-            <tag> gamedev </tag>
-            
             <tag> c# </tag>
+            
+            <tag> gamedev </tag>
             
         </tags>
       
@@ -327,9 +327,9 @@
       
         <tags>
             
-            <tag> unity </tag>
-            
             <tag> gamedev </tag>
+            
+            <tag> unity </tag>
             
         </tags>
       
@@ -381,9 +381,9 @@
       
         <tags>
             
-            <tag> unity </tag>
-            
             <tag> gamedev </tag>
+            
+            <tag> unity </tag>
             
         </tags>
       
@@ -408,9 +408,9 @@
       
         <tags>
             
-            <tag> unity </tag>
-            
             <tag> c# </tag>
+            
+            <tag> unity </tag>
             
             <tag> object pool </tag>
             
@@ -493,9 +493,9 @@
       
         <tags>
             
-            <tag> unity </tag>
-            
             <tag> gamedev </tag>
+            
+            <tag> unity </tag>
             
             <tag> vfs </tag>
             
@@ -524,9 +524,9 @@
       
         <tags>
             
-            <tag> unity </tag>
-            
             <tag> c# </tag>
+            
+            <tag> unity </tag>
             
         </tags>
       
@@ -653,9 +653,9 @@
       
         <tags>
             
-            <tag> unity </tag>
-            
             <tag> gamedev </tag>
+            
+            <tag> unity </tag>
             
         </tags>
       
@@ -680,9 +680,9 @@
       
         <tags>
             
-            <tag> unity </tag>
-            
             <tag> gamedev </tag>
+            
+            <tag> unity </tag>
             
         </tags>
       
@@ -707,9 +707,9 @@
       
         <tags>
             
-            <tag> unity </tag>
-            
             <tag> gamedev </tag>
+            
+            <tag> unity </tag>
             
         </tags>
       
@@ -734,9 +734,9 @@
       
         <tags>
             
-            <tag> unity </tag>
-            
             <tag> gamedev </tag>
+            
+            <tag> unity </tag>
             
         </tags>
       
