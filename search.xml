@@ -68,7 +68,7 @@
       <link href="/posts/unity/gameplay/%E6%8A%80%E8%83%BD%E7%B3%BB%E7%BB%9F%E5%AE%9E%E7%8E%B004_Effect/"/>
       <url>/posts/unity/gameplay/%E6%8A%80%E8%83%BD%E7%B3%BB%E7%BB%9F%E5%AE%9E%E7%8E%B004_Effect/</url>
       
-        <content type="html"><![CDATA[<!-- ## 前言 --><summary><p>Effect。除了处理自身的生命周期、堆叠，角色的属性、状态外，还可以响应任何模块的事件。造成伤害？施加Effect！击退？施加Effect！Effect是技能系统的核心存在！</p><ol><li>数值，使用Variable，见 <a href="#">Post not found: unity/游戏玩法/技能系统实现01_数值表</a></li><li>角色属性，使用GameplayAttribute，见 <a href="#">Post not found: unity/游戏玩法/技能系统实现02_属性</a></li><li>角色状态，使用GameplayTagCountContainer，见 <a href="#">Post not found: unity/游戏玩法/游戏性标签</a></li><li>事件，使用GameplayTag和GameplayEvent，见 <a href="#">Post not found: unity/游戏玩法/技能系统实现03_事件</a></li></ol></summary>]]></content>
+        <content type="html"><![CDATA[<!-- ## 前言 --><summary><p>Effect。除了处理自身的生命周期、堆叠，角色的属性、状态外，还可以响应任何模块的事件。造成伤害？施加Effect！击退？施加Effect！Effect是技能系统的核心存在！</p><ol><li>数值，使用Variable，见 <a href="/posts/unity/gameplay/%E6%8A%80%E8%83%BD%E7%B3%BB%E7%BB%9F%E5%AE%9E%E7%8E%B001_%E6%95%B0%E5%80%BC%E8%A1%A8/" title="技能系统实现01 数值表">技能系统实现01 数值表</a></li><li>角色属性，使用GameplayAttribute，见 <a href="/posts/unity/gameplay/%E6%8A%80%E8%83%BD%E7%B3%BB%E7%BB%9F%E5%AE%9E%E7%8E%B002_%E5%B1%9E%E6%80%A7/" title="技能系统实现02 属性">技能系统实现02 属性</a></li><li>角色状态，使用GameplayTagCountContainer，见 <a href="/posts/unity/gameplay/%E6%B8%B8%E6%88%8F%E6%80%A7%E6%A0%87%E7%AD%BE/" title="游戏性标签(GameplayTag)">游戏性标签(GameplayTag)</a></li><li>事件，使用GameplayTag和GameplayEvent，见 <a href="/posts/unity/gameplay/%E6%8A%80%E8%83%BD%E7%B3%BB%E7%BB%9F%E5%AE%9E%E7%8E%B003_%E4%BA%8B%E4%BB%B6/" title="技能系统实现03 事件">技能系统实现03 事件</a></li></ol></summary>]]></content>
       
       
       <categories>
@@ -225,9 +225,9 @@
       
         <tags>
             
-            <tag> gamedev </tag>
-            
             <tag> c# </tag>
+            
+            <tag> gamedev </tag>
             
         </tags>
       
@@ -285,9 +285,9 @@
             
             <tag> unity </tag>
             
-            <tag> gamedev </tag>
-            
             <tag> c# </tag>
+            
+            <tag> gamedev </tag>
             
         </tags>
       
@@ -393,9 +393,9 @@
       
         <tags>
             
-            <tag> gamedev </tag>
-            
             <tag> c# </tag>
+            
+            <tag> gamedev </tag>
             
         </tags>
       
